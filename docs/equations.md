@@ -48,3 +48,20 @@ so:
 ```text
 S ~= exp[-(2 pi sigma_waves)^2]
 ```
+
+## Simplified AO Error Budget
+
+The browser combines residual terms in quadrature:
+
+```text
+sigma_total = sqrt(sigma_modal^2 + sigma_fit^2 + sigma_servo^2 + sigma_wfs^2)
+```
+
+The fitting and servo-lag terms use Kolmogorov-style scaling intuition:
+
+```text
+sigma_fit proportional to (d / r0)^(5/6)
+sigma_servo proportional to (tau_delay / tau0)^(5/6)
+```
+
+where `d` is actuator pitch, `r0` is the Fried parameter, `tau_delay` is loop delay, and `tau0` is atmospheric coherence time. Coefficients are illustrative and chosen for interactive scaling, not calibrated instrument prediction.

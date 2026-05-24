@@ -5,3 +5,5 @@ coma_rms_normalisation,0.9998207636567494,1.0,True
 trefoil_rms_normalisation,0.9998160220512647,1.0,True
 strehl_at_zero_rms,1.0,1.0,True
 strehl_monotonic,True,True,True
+fitting_error_pitch_monotonic,True,True,True
+servo_error_delay_monotonic,True,True,True

@@ -29,12 +29,25 @@
           <label>Coma <output id="comaOut">0.30 waves</output><input id="coma" type="range" min="-1" max="1" value="0.30" step="0.01"></label>
           <label>Trefoil <output id="trefoilOut">0.18 waves</output><input id="trefoil" type="range" min="-1" max="1" value="0.18" step="0.01"></label>
           <label>Loop gain <output id="gainOut">0.70</output><input id="gain" type="range" min="0" max="1" value="0.7" step="0.01"></label>
+          <h2>AO Error Budget</h2>
+          <label>Actuator pitch <output id="pitchOut">0.28 m</output><input id="actuatorPitch" type="range" min="0.08" max="0.8" value="0.28" step="0.01"></label>
+          <label>Fried parameter r0 <output id="r0Out">0.16 m</output><input id="friedR0" type="range" min="0.05" max="0.5" value="0.16" step="0.01"></label>
+          <label>Loop delay <output id="delayOut">2.0 ms</output><input id="loopDelay" type="range" min="0" max="12" value="2" step="0.1"></label>
+          <label>Coherence time <output id="tau0Out">4.0 ms</output><input id="coherenceTime" type="range" min="1" max="20" value="4" step="0.1"></label>
+          <label>WFS noise <output id="wfsOut">0.030 waves</output><input id="wfsNoise" type="range" min="0" max="0.18" value="0.03" step="0.005"></label>
         </aside>
 
         <section class="views">
+          <article class="panel wide error-grid">
+            <div><span>Modal residual</span><strong id="modalResidual">0.000 waves</strong></div>
+            <div><span>Fitting error</span><strong id="fittingError">0.000 waves</strong></div>
+            <div><span>Servo lag</span><strong id="servoLag">0.000 waves</strong></div>
+            <div><span>Total residual</span><strong id="totalResidual">0.000 waves</strong></div>
+          </article>
           <article class="panel"><h2>Incoming Wavefront</h2><canvas id="inputCanvas" width="520" height="520"></canvas></article>
           <article class="panel"><h2>Corrected Wavefront</h2><canvas id="correctedCanvas" width="520" height="520"></canvas></article>
           <article class="panel wide"><h2>Point Spread Function Sketch</h2><canvas id="psfCanvas" width="980" height="300"></canvas></article>
+          <article class="panel wide"><h2>Residual Error Budget</h2><canvas id="budgetCanvas" width="980" height="300"></canvas></article>
         </section>
       </section>
     </main>

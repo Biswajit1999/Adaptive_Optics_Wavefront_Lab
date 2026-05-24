@@ -42,6 +42,14 @@ def strehl(rms_waves: float) -> float:
     return math.exp(-((2 * math.pi * rms_waves) ** 2))
 
 
+def fitting_error(pitch: float, r0: float) -> float:
+    return 0.28 * (pitch / r0) ** (5 / 6) / (2 * math.pi)
+
+
+def servo_error(delay: float, tau0: float) -> float:
+    return 0.30 * (delay / tau0) ** (5 / 6) / (2 * math.pi)
+
+
 def main() -> None:
     modes = ["defocus", "astig", "coma", "trefoil"]
     output = Path(__file__).resolve().parents[1] / "data" / "validation_summary.csv"
@@ -51,6 +59,8 @@ def main() -> None:
         rows.append({"check": f"{mode}_rms_normalisation", "value": rms, "expected": 1.0, "passed": abs(rms - 1.0) < 0.02})
     rows.append({"check": "strehl_at_zero_rms", "value": strehl(0.0), "expected": 1.0, "passed": math.isclose(strehl(0.0), 1.0)})
     rows.append({"check": "strehl_monotonic", "value": strehl(0.15) < strehl(0.05), "expected": True, "passed": strehl(0.15) < strehl(0.05)})
+    rows.append({"check": "fitting_error_pitch_monotonic", "value": fitting_error(0.32, 0.16) > fitting_error(0.16, 0.16), "expected": True, "passed": fitting_error(0.32, 0.16) > fitting_error(0.16, 0.16)})
+    rows.append({"check": "servo_error_delay_monotonic", "value": servo_error(4.0, 4.0) > servo_error(2.0, 4.0), "expected": True, "passed": servo_error(4.0, 4.0) > servo_error(2.0, 4.0)})
     with output.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=["check", "value", "expected", "passed"])
         writer.writeheader()

@@ -22,6 +22,10 @@
    sigma_total ~= sqrt(sum a_j^2)
    ```
 
+5. **AO error-budget monotonicity**
+
+   Increasing actuator pitch relative to `r0` should increase the fitting-error term. Increasing loop delay relative to `tau0` should increase the servo-lag term.
+
 ## Scientific Scope
 
 The current validation checks the internal mathematics of the simplified modal model. It does not validate a real AO control loop, wavefront sensor reconstruction, deformable mirror influence functions, or physical diffraction propagation.

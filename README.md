@@ -36,14 +36,17 @@ The implemented browser modes are defocus, oblique astigmatism, horizontal coma,
 
 - Defocus, astigmatism, coma, and trefoil controls.
 - Loop gain control for simplified AO correction.
+- AO-style residual error budget with fitting, servo-lag, and wavefront-sensor noise terms.
 - Incoming and corrected wavefront heatmaps.
 - PSF sketch showing qualitative sharpening.
 - RMS and Strehl readouts.
+- Residual error-budget bar chart.
 
 ## Research Use Cases
 
 - Demonstrating Zernike modal decomposition and residual RMS concepts for astronomical instrumentation.
 - Exploring the relationship between wavefront error and Strehl ratio before moving to full Fourier optics.
+- Building intuition for how AO performance is limited by more than ideal modal correction.
 - Creating synthetic AO performance tables for dashboards or early-stage control-system explanations.
 - Acting as a visual companion to future EXOhSPEC-style stability and optical alignment projects.
 
@@ -64,7 +67,7 @@ A README hero image prompt is provided in [`docs/image_prompt.md`](docs/image_pr
 
 ## Limitations
 
-This is a pedagogical model. It does not include a Shack-Hartmann wavefront sensor, deformable mirror influence functions, temporal bandwidth, photon noise, servo lag, anisoplanatism, or a physical Fourier optics PSF.
+This is a pedagogical model. It does not include a Shack-Hartmann wavefront sensor, deformable mirror influence functions, anisoplanatism, chromatic propagation, or a physical Fourier optics PSF. The fitting and servo-lag terms are scaling-law diagnostics, not a calibrated AO performance model.
 
 ## Research References
 
