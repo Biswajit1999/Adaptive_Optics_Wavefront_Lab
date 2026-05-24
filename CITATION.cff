@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this educational research tool, please cite it as below."
+title: "Adaptive Optics Wavefront Lab"
+authors:
+  - family-names: "Jana"
+    given-names: "Biswajit"
+year: 2026
+license: "MIT"
+repository-code: "https://github.com/Biswajit1999/Adaptive_Optics_Wavefront_Lab"

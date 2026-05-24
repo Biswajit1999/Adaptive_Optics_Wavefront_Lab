@@ -1,0 +1,7 @@
+check,value,expected,passed
+defocus_rms_normalisation,0.9998785321934899,1.0,True
+astig_rms_normalisation,0.9993841236187285,1.0,True
+coma_rms_normalisation,0.9998207636567494,1.0,True
+trefoil_rms_normalisation,0.9998160220512647,1.0,True
+strehl_at_zero_rms,1.0,1.0,True
+strehl_monotonic,True,True,True

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Interactive adaptive optics wavefront correction laboratory.">
+    <title>Adaptive Optics Wavefront Lab</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <p>Instrumentation and Wavefront Control</p>
+        <h1>Adaptive Optics Wavefront Lab</h1>
+      </header>
+
+      <section class="metrics">
+        <div><span>Input RMS</span><strong id="inputRms">0.00 waves</strong></div>
+        <div><span>Corrected RMS</span><strong id="outputRms">0.00 waves</strong></div>
+        <div><span>Approx. Strehl</span><strong id="strehl">1.00</strong></div>
+        <div><span>Loop gain</span><strong id="gainReadout">0.70</strong></div>
+      </section>
+
+      <section class="layout">
+        <aside class="panel">
+          <h2>Aberration Controls</h2>
+          <label>Defocus <output id="defocusOut">0.25 waves</output><input id="defocus" type="range" min="-1" max="1" value="0.25" step="0.01"></label>
+          <label>Astigmatism <output id="astigOut">0.35 waves</output><input id="astig" type="range" min="-1" max="1" value="0.35" step="0.01"></label>
+          <label>Coma <output id="comaOut">0.30 waves</output><input id="coma" type="range" min="-1" max="1" value="0.30" step="0.01"></label>
+          <label>Trefoil <output id="trefoilOut">0.18 waves</output><input id="trefoil" type="range" min="-1" max="1" value="0.18" step="0.01"></label>
+          <label>Loop gain <output id="gainOut">0.70</output><input id="gain" type="range" min="0" max="1" value="0.7" step="0.01"></label>
+        </aside>
+
+        <section class="views">
+          <article class="panel"><h2>Incoming Wavefront</h2><canvas id="inputCanvas" width="520" height="520"></canvas></article>
+          <article class="panel"><h2>Corrected Wavefront</h2><canvas id="correctedCanvas" width="520" height="520"></canvas></article>
+          <article class="panel wide"><h2>Point Spread Function Sketch</h2><canvas id="psfCanvas" width="980" height="300"></canvas></article>
+        </section>
+      </section>
+    </main>
+    <script src="assets/js/app.js"></script>
+  </body>
+</html>
