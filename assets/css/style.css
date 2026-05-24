@@ -53,6 +53,14 @@ input { width: 100%; accent-color: var(--green); }
 .wide { grid-column: 1 / -1; }
 canvas { display: block; width: 100%; height: auto; background: #0d1114; border-radius: 6px; }
 
+.site-footer {
+  padding: 1.2rem clamp(1rem, 3vw, 2rem) 1.6rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: center;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
 @media (max-width: 980px) {
   .layout, .metrics, .views { grid-template-columns: 1fr; }
 }
