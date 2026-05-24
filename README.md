@@ -58,6 +58,10 @@ python tools/strehl_table.py
 python tools/validate_model.py
 ```
 
+## README Image Prompt
+
+A README hero image prompt is provided in [`docs/image_prompt.md`](docs/image_prompt.md). It focuses on telescope instrumentation, wavefront sensing, deformable mirrors, and PSF sharpening.
+
 ## Limitations
 
 This is a pedagogical model. It does not include a Shack-Hartmann wavefront sensor, deformable mirror influence functions, temporal bandwidth, photon noise, servo lag, anisoplanatism, or a physical Fourier optics PSF.
