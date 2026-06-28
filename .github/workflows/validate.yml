@@ -1,0 +1,24 @@
+name: Validate AO science model
+
+on:
+  pull_request:
+  push:
+    branches: [main, upgrade-v2-science-validation]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Generate reference tables
+        run: python tools/strehl_table.py
+      - name: Validate Python model
+        run: python tools/validate_model.py
+      - name: Validate browser model contract
+        run: node tools/validate_browser_contract.js
