@@ -27,7 +27,7 @@ h2 { margin: 0 0 1rem; font-size: 1rem; }
 
 .metrics {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
   gap: .75rem;
   margin-bottom: 1rem;
 }
@@ -52,6 +52,7 @@ input { width: 100%; accent-color: var(--green); }
 .views { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; }
 .wide { grid-column: 1 / -1; }
 canvas { display: block; width: 100%; height: auto; background: #0d1114; border-radius: 6px; }
+.panel-note { margin: .75rem 0 0; color: var(--muted); font-size: .78rem; line-height: 1.45; }
 
 .error-grid {
   display: grid;
@@ -86,5 +87,5 @@ canvas { display: block; width: 100%; height: auto; background: #0d1114; border-
 }
 
 @media (max-width: 980px) {
-  .layout, .metrics, .views, .error-grid { grid-template-columns: 1fr; }
+  .layout, .views, .error-grid { grid-template-columns: 1fr; }
 }
