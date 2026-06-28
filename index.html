@@ -12,12 +12,13 @@
       <header>
         <p>Instrumentation and Wavefront Control</p>
         <h1>Adaptive Optics Wavefront Lab</h1>
+        <p class="science-note">Pedagogical low-order AO model: RMS-normalised Zernike modes, quadrature residual budget, and Marechal Strehl estimate. The PSF panel is a labelled sketch, not a Fourier-optics calculation.</p>
       </header>
 
       <section class="metrics">
-        <div><span>Input RMS</span><strong id="inputRms">0.00 waves</strong></div>
-        <div><span>Corrected RMS</span><strong id="outputRms">0.00 waves</strong></div>
-        <div><span>Approx. Strehl</span><strong id="strehl">1.00</strong></div>
+        <div><span>Input modal RMS</span><strong id="inputRms">0.00 waves</strong></div>
+        <div><span>Total residual RMS</span><strong id="outputRms">0.00 waves</strong></div>
+        <div><span>Marechal Strehl</span><strong id="strehl">1.00</strong></div>
         <div><span>Loop gain</span><strong id="gainReadout">0.70</strong></div>
       </section>
 
@@ -45,13 +46,13 @@
             <div><span>Total residual</span><strong id="totalResidual">0.000 waves</strong></div>
           </article>
           <article class="panel"><h2>Incoming Wavefront</h2><canvas id="inputCanvas" width="520" height="520"></canvas></article>
-          <article class="panel"><h2>Corrected Wavefront</h2><canvas id="correctedCanvas" width="520" height="520"></canvas></article>
-          <article class="panel wide"><h2>Point Spread Function Sketch</h2><canvas id="psfCanvas" width="980" height="300"></canvas></article>
+          <article class="panel"><h2>Corrected Modal Wavefront</h2><canvas id="correctedCanvas" width="520" height="520"></canvas></article>
+          <article class="panel wide"><h2>PSF Width Sketch, Not FFT</h2><canvas id="psfCanvas" width="980" height="300"></canvas></article>
           <article class="panel wide"><h2>Residual Error Budget</h2><canvas id="budgetCanvas" width="980" height="300"></canvas></article>
         </section>
       </section>
     </main>
-    <footer class="site-footer">Biswajit@2026</footer>
+    <footer class="site-footer">Biswajit Jana © 2026</footer>
     <script src="assets/js/app.js"></script>
   </body>
 </html>
