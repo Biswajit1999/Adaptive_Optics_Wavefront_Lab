@@ -1,57 +1,101 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Interactive adaptive optics wavefront correction laboratory.">
-    <title>Adaptive Optics Wavefront Lab</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-  </head>
-  <body>
-    <main class="shell">
-      <header>
-        <p>Instrumentation and Wavefront Control</p>
-        <h1>Adaptive Optics Wavefront Lab</h1>
-      </header>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Interactive adaptive optics wavefront laboratory with pupil geometry, Fourier PSF and MTF diagnostics.">
+<title>Adaptive Optics Wavefront Lab</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<div class="page-glow" aria-hidden="true"></div>
+<main class="shell">
+<header class="hero" id="top">
+  <div class="hero__copy">
+    <p class="eyebrow"><span class="signal-dot" aria-hidden="true"></span>Instrumentation / wavefront control</p>
+    <h1>Adaptive optics<br><span>wavefront laboratory</span></h1>
+    <p class="hero__lede">Trace a defined low-order pupil phase through modal correction, a selected aperture, a Fourier point-spread function, and a sampled optical-transfer diagnostic.</p>
+    <div class="hero__actions">
+      <a class="button button--primary" href="#laboratory">Enter laboratory <span aria-hidden="true">↓</span></a>
+      <button id="pauseHeroButton" class="button button--quiet" type="button" aria-pressed="false">Pause visual layer</button>
+    </div>
+    <dl class="hero__facts">
+      <div><dt>Representation</dt><dd>phase-only</dd></div>
+      <div><dt>Transform</dt><dd>2D FFT</dd></div>
+      <div><dt>Scope</dt><dd>monochromatic</dd></div>
+    </dl>
+  </div>
+  <section class="hero__stage" aria-label="Control-linked optical context">
+    <canvas id="aoHeroCanvas" aria-label="Animated optical context driven by active control settings"></canvas>
+    <div class="hero__stage-frame" aria-hidden="true"></div>
+    <div class="hero__telemetry">
+      <div class="hero__telemetry-head"><span>LIVE MODEL STATE</span><strong id="heroLiveState">live modal correction context</strong></div>
+      <div class="hero__telemetry-grid">
+        <div><span>input RMS</span><strong id="heroInputRms">0.000 waves</strong></div>
+        <div><span>modal RMS</span><strong id="heroResidualRms">0.000 waves</strong></div>
+        <div><span>direct peak</span><strong id="heroDirectPeak">0.000</strong></div>
+      </div>
+      <p>Visual context only. The scientific phase maps, PSF, MTF, and error budget below are the authoritative model outputs.</p>
+    </div>
+  </section>
+</header>
 
-      <section class="metrics">
-        <div><span>Input RMS</span><strong id="inputRms">0.00 waves</strong></div>
-        <div><span>Corrected RMS</span><strong id="outputRms">0.00 waves</strong></div>
-        <div><span>Approx. Strehl</span><strong id="strehl">1.00</strong></div>
-        <div><span>Loop gain</span><strong id="gainReadout">0.70</strong></div>
-      </section>
+<section class="metrics" aria-label="Adaptive optics summary">
+  <div><span>Input modal RMS</span><strong id="inputRms">0.00 waves</strong><small>selected phase coefficients</small></div>
+  <div><span>Corrected modal RMS</span><strong id="outputRms">0.00 waves</strong><small>ideal scalar modal response</small></div>
+  <div><span>Direct PSF peak</span><strong id="directStrehl">1.00</strong><small>matching ideal pupil reference</small></div>
+  <div><span>Approx. Marechal Strehl</span><strong id="strehl">1.00</strong><small>low-aberration diagnostic</small></div>
+  <div><span>Modal loop gain</span><strong id="gainReadout">0.70</strong><small>phase-only correction term</small></div>
+</section>
 
-      <section class="layout">
-        <aside class="panel">
-          <h2>Aberration Controls</h2>
-          <label>Defocus <output id="defocusOut">0.25 waves</output><input id="defocus" type="range" min="-1" max="1" value="0.25" step="0.01"></label>
-          <label>Astigmatism <output id="astigOut">0.35 waves</output><input id="astig" type="range" min="-1" max="1" value="0.35" step="0.01"></label>
-          <label>Coma <output id="comaOut">0.30 waves</output><input id="coma" type="range" min="-1" max="1" value="0.30" step="0.01"></label>
-          <label>Trefoil <output id="trefoilOut">0.18 waves</output><input id="trefoil" type="range" min="-1" max="1" value="0.18" step="0.01"></label>
-          <label>Loop gain <output id="gainOut">0.70</output><input id="gain" type="range" min="0" max="1" value="0.7" step="0.01"></label>
-          <h2>AO Error Budget</h2>
-          <label>Actuator pitch <output id="pitchOut">0.28 m</output><input id="actuatorPitch" type="range" min="0.08" max="0.8" value="0.28" step="0.01"></label>
-          <label>Fried parameter r0 <output id="r0Out">0.16 m</output><input id="friedR0" type="range" min="0.05" max="0.5" value="0.16" step="0.01"></label>
-          <label>Loop delay <output id="delayOut">2.0 ms</output><input id="loopDelay" type="range" min="0" max="12" value="2" step="0.1"></label>
-          <label>Coherence time <output id="tau0Out">4.0 ms</output><input id="coherenceTime" type="range" min="1" max="20" value="4" step="0.1"></label>
-          <label>WFS noise <output id="wfsOut">0.030 waves</output><input id="wfsNoise" type="range" min="0" max="0.18" value="0.03" step="0.005"></label>
-        </aside>
+<section id="laboratory" class="layout">
+  <aside class="panel control-panel">
+    <div class="panel__heading"><span>CONTROL RACK</span><h2>Optical state</h2><p>Every slider updates the pupil and Fourier diagnostics at the same time.</p></div>
+    <section class="control-group">
+      <div class="control-group__head"><span>01</span><h3>Low-order phase</h3></div>
+      <label>Defocus <output id="defocusOut">0.25 waves</output><input id="defocus" type="range" min="-1" max="1" value="0.25" step="0.01"></label>
+      <label>Astigmatism <output id="astigOut">0.35 waves</output><input id="astig" type="range" min="-1" max="1" value="0.35" step="0.01"></label>
+      <label>Coma <output id="comaOut">0.30 waves</output><input id="coma" type="range" min="-1" max="1" value="0.30" step="0.01"></label>
+      <label>Trefoil <output id="trefoilOut">0.18 waves</output><input id="trefoil" type="range" min="-1" max="1" value="0.18" step="0.01"></label>
+      <label>Modal loop gain <output id="gainOut">0.70</output><input id="gain" type="range" min="0" max="1" value="0.7" step="0.01"></label>
+    </section>
+    <section class="control-group">
+      <div class="control-group__head"><span>02</span><h3>Pupil geometry</h3></div>
+      <label>Central obstruction diameter <output id="obscurationOut">0.28 D</output><input id="obscuration" type="range" min="0" max="0.60" value="0.28" step="0.01"></label>
+      <label>Four-vane width <output id="spiderOut">0.015 D</output><input id="spiderWidth" type="range" min="0" max="0.08" value="0.015" step="0.001"></label>
+    </section>
+    <section class="control-group control-group--last">
+      <div class="control-group__head"><span>03</span><h3>Illustrative error budget</h3></div>
+      <label>Actuator pitch <output id="pitchOut">0.28 m</output><input id="actuatorPitch" type="range" min="0.08" max="0.8" value="0.28" step="0.01"></label>
+      <label>Fried parameter r0 <output id="r0Out">0.16 m</output><input id="friedR0" type="range" min="0.05" max="0.5" value="0.16" step="0.01"></label>
+      <label>Loop delay <output id="delayOut">2.0 ms</output><input id="loopDelay" type="range" min="0" max="12" value="2" step="0.1"></label>
+      <label>Coherence time <output id="tau0Out">4.0 ms</output><input id="coherenceTime" type="range" min="1" max="20" value="4" step="0.1"></label>
+      <label>WFS noise <output id="wfsOut">0.030 waves</output><input id="wfsNoise" type="range" min="0" max="0.18" value="0.03" step="0.005"></label>
+    </section>
+  </aside>
 
-        <section class="views">
-          <article class="panel wide error-grid">
-            <div><span>Modal residual</span><strong id="modalResidual">0.000 waves</strong></div>
-            <div><span>Fitting error</span><strong id="fittingError">0.000 waves</strong></div>
-            <div><span>Servo lag</span><strong id="servoLag">0.000 waves</strong></div>
-            <div><span>Total residual</span><strong id="totalResidual">0.000 waves</strong></div>
-          </article>
-          <article class="panel"><h2>Incoming Wavefront</h2><canvas id="inputCanvas" width="520" height="520"></canvas></article>
-          <article class="panel"><h2>Corrected Wavefront</h2><canvas id="correctedCanvas" width="520" height="520"></canvas></article>
-          <article class="panel wide"><h2>Point Spread Function Sketch</h2><canvas id="psfCanvas" width="980" height="300"></canvas></article>
-          <article class="panel wide"><h2>Residual Error Budget</h2><canvas id="budgetCanvas" width="980" height="300"></canvas></article>
-        </section>
-      </section>
-    </main>
-    <footer class="site-footer">Biswajit@2026</footer>
-    <script src="assets/js/app.js"></script>
-  </body>
+  <section class="views">
+    <article class="panel wide error-grid">
+      <div><span>Modal residual</span><strong id="modalResidual">0.000 waves</strong><small>displayed phase response</small></div>
+      <div><span>Fitting term</span><strong id="fittingError">0.000 waves</strong><small>illustrative scalar term</small></div>
+      <div><span>Servo-lag term</span><strong id="servoLag">0.000 waves</strong><small>illustrative scalar term</small></div>
+      <div><span>System RSS residual</span><strong id="totalResidual">0.000 waves</strong><small>diagnostic total</small></div>
+    </article>
+    <article class="panel panel--phase"><div class="panel__title"><span>PHASE PLANE / INPUT</span><h2>Incoming pupil phase</h2></div><canvas id="inputCanvas" width="520" height="520"></canvas></article>
+    <article class="panel panel--phase"><div class="panel__title"><span>PHASE PLANE / MODAL</span><h2>Modal-corrected pupil</h2></div><canvas id="correctedCanvas" width="520" height="520"></canvas></article>
+    <article class="panel wide"><div class="panel__title"><span>FOURIER PLANE / DIFFRACTION</span><h2>Fraunhofer PSF from selected pupil</h2></div><canvas id="psfCanvas" width="980" height="300"></canvas><p class="panel-note">Direct peaks use an unaberrated pupil with the same obstruction and vane geometry.</p></article>
+    <article class="panel wide"><div class="panel__title"><span>FREQUENCY DOMAIN / RESPONSE</span><h2>Azimuthal modulation transfer function</h2></div><canvas id="mtfCanvas" width="980" height="260"></canvas><p class="panel-note">Radial mean of the normalised sampled OTF. Monochromatic and not a calibrated telescope MTF.</p></article>
+    <article class="panel wide"><div class="panel__title"><span>DIAGNOSTIC / ERROR BUDGET</span><h2>Illustrative residual error budget</h2></div><canvas id="budgetCanvas" width="980" height="300"></canvas><p class="panel-note">The scalar error terms are not injected into the displayed pupil or PSF.</p></article>
+  </section>
+</section>
+
+<section class="method-strip" aria-label="Model boundary">
+  <div><span>MODEL BOUNDARY</span><strong>Not an end-to-end adaptive-optics simulator.</strong></div>
+  <p>No measured telescope pupil, turbulence time series, deformable-mirror influence functions, detector sampling, amplitude errors, or closed-loop WFS reconstruction are included.</p>
+</section>
+</main>
+<footer class="site-footer"><span>Adaptive Optics Wavefront Lab</span><span>Biswajit Jana / 2026</span><span>Phase → pupil → PSF → MTF</span></footer>
+<script src="assets/js/optical-hero.js"></script>
+<script src="assets/js/fourier-optics.js"></script>
+</body>
 </html>
