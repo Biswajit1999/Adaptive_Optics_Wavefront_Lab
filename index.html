@@ -1,5 +1,26 @@
 <!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Interactive adaptive optics wavefront correction laboratory.">
+    <title>Adaptive Optics Wavefront Lab</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <p>Instrumentation and Wavefront Control</p>
+        <h1>Adaptive Optics Wavefront Lab</h1>
+        <p class="science-note">Pedagogical low-order AO model: RMS-normalised Zernike modes, quadrature residual budget, and Marechal Strehl estimate. The PSF panel is a labelled sketch, not a Fourier-optics calculation.</p>
+      </header>
+
+      <section class="metrics">
+        <div><span>Input modal RMS</span><strong id="inputRms">0.00 waves</strong></div>
+        <div><span>Total residual RMS</span><strong id="outputRms">0.00 waves</strong></div>
+        <div><span>Marechal Strehl</span><strong id="strehl">1.00</strong></div>
+        <div><span>Loop gain</span><strong id="gainReadout">0.70</strong></div>
+      </section>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -74,6 +95,23 @@
     </section>
   </aside>
 
+        <section class="views">
+          <article class="panel wide error-grid">
+            <div><span>Modal residual</span><strong id="modalResidual">0.000 waves</strong></div>
+            <div><span>Fitting error</span><strong id="fittingError">0.000 waves</strong></div>
+            <div><span>Servo lag</span><strong id="servoLag">0.000 waves</strong></div>
+            <div><span>Total residual</span><strong id="totalResidual">0.000 waves</strong></div>
+          </article>
+          <article class="panel"><h2>Incoming Wavefront</h2><canvas id="inputCanvas" width="520" height="520"></canvas></article>
+          <article class="panel"><h2>Corrected Modal Wavefront</h2><canvas id="correctedCanvas" width="520" height="520"></canvas></article>
+          <article class="panel wide"><h2>PSF Width Sketch, Not FFT</h2><canvas id="psfCanvas" width="980" height="300"></canvas></article>
+          <article class="panel wide"><h2>Residual Error Budget</h2><canvas id="budgetCanvas" width="980" height="300"></canvas></article>
+        </section>
+      </section>
+    </main>
+    <footer class="site-footer">Biswajit Jana © 2026</footer>
+    <script src="assets/js/app.js"></script>
+  </body>
   <section class="views">
     <article class="panel wide error-grid">
       <div><span>Modal residual</span><strong id="modalResidual">0.000 waves</strong><small>displayed phase response</small></div>

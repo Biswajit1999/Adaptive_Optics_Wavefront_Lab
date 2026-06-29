@@ -74,6 +74,11 @@ The Python script checks Zernike RMS normalization, gain limits, RSS behaviour, 
 
 ## References
 
+- Add full Zernike mode library with Noll indices.
+- Add Fourier-transform PSF calculation with explicit pupil sampling.
+- Add closed-loop time evolution and sensor noise.
+- Add Python validation plots for RMS and Strehl scaling.
+- Add Shack-Hartmann spot displacement simulation.
 - Noll, 1976, Zernike polynomials and atmospheric turbulence.
 - Roddier, 1999, Adaptive Optics in Astronomy.
 - Hardy, 1998, Adaptive Optics for Astronomical Telescopes.
