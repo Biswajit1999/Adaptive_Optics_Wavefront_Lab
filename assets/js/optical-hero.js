@@ -7,6 +7,9 @@
   let state = { inputRms: 0.35, modalRms: 0.12, gain: 0.7, directPeak: 0.7, obscuration: 0.28 };
   let paused = reduceMotion;
   const pauseButton = document.getElementById('pauseHeroButton');
+  const inputRmsReadout = document.getElementById('heroInputRms');
+  const residualReadout = document.getElementById('heroResidualRms');
+  const directPeakReadout = document.getElementById('heroDirectPeak');
 
   function resize() {
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -18,6 +21,31 @@
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
     }
     return { width: canvas.clientWidth, height: canvas.clientHeight };
+  }
+
+  function updateReadouts() {
+    if (inputRmsReadout) inputRmsReadout.textContent = `${state.inputRms.toFixed(3)} waves`;
+    if (residualReadout) residualReadout.textContent = `${state.modalRms.toFixed(3)} waves`;
+    if (directPeakReadout) directPeakReadout.textContent = state.directPeak.toFixed(3);
+  }
+
+  function syncFromControls() {
+    const value = (id) => Number(document.getElementById(id)?.value ?? 0);
+    const defocus = value('defocus');
+    const astig = value('astig');
+    const coma = value('coma');
+    const trefoil = value('trefoil');
+    const gain = value('gain');
+    const directPeak = Number(document.getElementById('directStrehl')?.textContent ?? state.directPeak);
+    state = {
+      ...state,
+      inputRms: Math.sqrt(defocus ** 2 + astig ** 2 + coma ** 2 + trefoil ** 2),
+      modalRms: Math.abs(1 - gain) * Math.sqrt(defocus ** 2 + astig ** 2 + coma ** 2 + trefoil ** 2),
+      gain,
+      obscuration: value('obscuration'),
+      directPeak: Number.isFinite(directPeak) ? directPeak : state.directPeak,
+    };
+    updateReadouts();
   }
 
   function draw(now) {
@@ -84,19 +112,17 @@
 
   window.addEventListener('ao:state', (event) => {
     state = { ...state, ...event.detail };
-    const input = document.getElementById('heroInputRms');
-    const residual = document.getElementById('heroResidualRms');
-    const directPeak = document.getElementById('heroDirectPeak');
-    if (input) input.textContent = `${state.inputRms.toFixed(3)} waves`;
-    if (residual) residual.textContent = `${state.modalRms.toFixed(3)} waves`;
-    if (directPeak) directPeak.textContent = state.directPeak.toFixed(3);
+    updateReadouts();
   });
-
+  document.querySelectorAll('input[type="range"]').forEach((control) => {
+    control.addEventListener('input', () => window.setTimeout(syncFromControls, 0));
+  });
   pauseButton?.addEventListener('click', () => {
     paused = !paused;
     pauseButton.setAttribute('aria-pressed', String(paused));
     pauseButton.textContent = paused ? 'Resume visual layer' : 'Pause visual layer';
   });
   window.addEventListener('resize', resize);
+  window.setTimeout(syncFromControls, 0);
   requestAnimationFrame(draw);
 })();
