@@ -1,96 +1,88 @@
 # Adaptive Optics Wavefront Lab
 
-Interactive adaptive optics simulator for visualising low-order wavefront aberrations and simplified closed-loop correction.
+Interactive adaptive optics laboratory for low-order Zernike aberrations, modal correction, selected pupil geometry, Fourier point-spread functions, modulation transfer diagnostics, and a deliberately limited error budget.
 
 **Author:** Biswajit Jana
 
-## Research Motivation
+## Purpose
 
-Adaptive optics improves telescope image quality by measuring and correcting atmospheric or instrumental wavefront errors. This project provides a compact visual lab for understanding how low-order aberration modes affect residual wavefront RMS and approximate Strehl ratio before moving to a full Fourier-optics or real-time-control simulation.
+This browser laboratory connects a pupil-plane wavefront error to a focal-plane diffraction pattern. It is designed for scientific intuition and transparent model boundaries, not for calibrated observatory performance prediction.
 
-## Model
+## Optical model
 
-The wavefront is represented as a weighted sum of low-order, RMS-normalised Zernike modes over a circular pupil:
+The input wavefront is a weighted sum of low-order RMS-normalised Zernike modes:
 
 ```text
 W(x, y) = sum a_i Z_i(x, y)
 ```
 
-The corrected modal wavefront is approximated by:
+The modal controller is an ideal scalar response:
 
 ```text
-W_corrected = (1 - gain) W
+W_residual = (1 - gain) W
 ```
 
-The residual budget is combined in quadrature:
+The complex pupil and monochromatic PSF are
 
 ```text
-sigma_total = sqrt(sigma_modal^2 + sigma_fit^2 + sigma_servo^2 + sigma_wfs^2)
+E(x, y) = P(x, y) exp(i 2 pi W(x, y))
+PSF = |FFT(E)|^2
 ```
 
-The Strehl estimate uses the Marechal approximation:
+`P` is a binary selected pupil. It can include a central obstruction and four orthogonal support vanes. The direct central peak is normalized against an unaberrated pupil with the same geometry, so changing the obstruction or vanes does not get misreported as a phase-correction loss.
+
+The MTF panel is an azimuthal average of the normalized sampled optical transfer function derived from the computed PSF.
+
+The separate compact residual budget uses the low-aberration Marechal relation:
 
 ```text
-S ~= exp[-(2 pi sigma_total)^2]
+S ~= exp[-(2 pi sigma)^2]
 ```
 
-where `sigma_total` is the residual RMS wavefront error in waves. The implemented browser modes are defocus, cosine astigmatism, cosine coma, and cosine trefoil in a Noll-style normalisation. Coefficients are interpreted as approximate RMS wavefront amplitudes in waves.
-
-Full assumptions are documented in [`docs/science_model.md`](docs/science_model.md).
+It should not be treated as a calibrated Strehl prediction at large aberration.
 
 ## Features
 
 - Defocus, astigmatism, coma, and trefoil controls.
-- Loop gain control for simplified AO correction.
-- AO-style residual error budget with fitting, servo-lag, and wavefront-sensor noise terms.
-- Incoming and corrected modal wavefront heatmaps.
-- Clearly labelled PSF sketch showing qualitative sharpening only.
-- RMS and Marechal Strehl readouts.
-- Residual error-budget bar chart.
+- Idealised modal loop-gain control.
+- Central obstruction and four-vane pupil geometry.
+- Input and modal-corrected pupil-phase maps.
+- Browser-native 2D FFT PSFs from the displayed complex pupil.
+- Direct PSF peak ratios against matching ideal pupils.
+- Input versus corrected sampled MTF profiles.
+- Explicit fitting, servo-lag, and wavefront-sensor RSS budget.
+- Node and Python validation checks.
 
-## Reproducibility and Validation
+## Run and validate
 
-Run the validation suite locally:
+Open `index.html` in a modern browser.
 
 ```bash
-python tools/strehl_table.py
 python tools/validate_model.py
-node tools/validate_browser_contract.js
+node tools/validate_fourier_psf.js
 ```
 
-The checks verify Zernike RMS normalisation over the unit pupil, Marechal Strehl behaviour, and monotonic fitting/servo-lag scaling. GitHub Actions runs the same validation commands for pull requests.
+The Python script checks Zernike RMS normalization, gain limits, RSS behaviour, and compact scaling laws. The Node script checks clear and obstructed flat-pupil peak invariants and verifies that a phase perturbation reduces the direct peak.
 
-## Running Locally
+## Model boundaries
 
-Open `index.html` in a browser.
+- Monochromatic, phase-only pupil model.
+- Scalar modal gain rather than a WFS and deformable-mirror control loop.
+- No measured telescope pupil, real DM influence functions, phase-screen time series, anisoplanatism, chromatic propagation, scintillation, detector sampling, jitter, amplitude errors, or instrument calibration.
+- Fitting, servo-lag, and WFS terms remain a separate RSS diagnostic and are not painted into the PSF as artificial static phase screens.
+- The MTF is a sampled visual diagnostic, not a calibrated telescope MTF.
 
-No build step is required for the static interface.
-
-## README Image Prompt
-
-A README hero image prompt is provided in [`docs/image_prompt.md`](docs/image_prompt.md). It focuses on telescope instrumentation, wavefront sensing, deformable mirrors, and PSF sharpening.
-
-## Limitations
-
-This is a pedagogical model. It does not include a Shack-Hartmann wavefront sensor, deformable mirror influence functions, anisoplanatism, chromatic propagation, telescope central obstruction, spiders, pupil segmentation, amplitude errors, or a physical Fourier-optics PSF. The fitting and servo-lag terms are scaling-law diagnostics, not a calibrated AO performance model.
-
-The PSF panel must not be treated as data. It is a labelled sketch, not `|FFT{P exp(i phase)}|^2`.
-
-## Research References
-
-- Noll, 1976, *Zernike polynomials and atmospheric turbulence*.
-- Roddier, 1999, *Adaptive Optics in Astronomy*.
-- Hardy, 1998, *Adaptive Optics for Astronomical Telescopes*.
-- Ellerbroek, 2005, adaptive optics performance and error-budget literature.
-
-## Future Upgrades
+## References
 
 - Add full Zernike mode library with Noll indices.
 - Add Fourier-transform PSF calculation with explicit pupil sampling.
 - Add closed-loop time evolution and sensor noise.
 - Add Python validation plots for RMS and Strehl scaling.
 - Add Shack-Hartmann spot displacement simulation.
+- Noll, 1976, Zernike polynomials and atmospheric turbulence.
+- Roddier, 1999, Adaptive Optics in Astronomy.
+- Hardy, 1998, Adaptive Optics for Astronomical Telescopes.
 
 ## Topics
 
-`adaptive-optics`, `instrumentation`, `astronomy`, `wavefront`, `zernike`, `control-systems`, `scientific-visualisation`, `javascript`
+`adaptive-optics`, `instrumentation`, `astronomy`, `wavefront`, `zernike`, `fourier-optics`, `scientific-visualisation`, `javascript`

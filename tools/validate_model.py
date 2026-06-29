@@ -1,4 +1,4 @@
-"""Validate Zernike normalisation and Strehl scaling."""
+"""Validate Zernike normalisation and compact AO scaling conventions."""
 
 from __future__ import annotations
 
@@ -50,6 +50,14 @@ def servo_error(delay: float, tau0: float) -> float:
     return 0.30 * (delay / tau0) ** (5 / 6) / (2 * math.pi)
 
 
+def modal_residual(input_rms: float, gain: float) -> float:
+    return abs(1.0 - gain) * input_rms
+
+
+def rss(*terms: float) -> float:
+    return math.sqrt(sum(term * term for term in terms))
+
+
 def main() -> None:
     modes = ["defocus", "astig", "coma", "trefoil"]
     output = Path(__file__).resolve().parents[1] / "data" / "validation_summary.csv"
@@ -57,10 +65,17 @@ def main() -> None:
     for mode in modes:
         rms = rms_mode(mode)
         rows.append({"check": f"{mode}_rms_normalisation", "value": rms, "expected": 1.0, "passed": abs(rms - 1.0) < 0.02})
-    rows.append({"check": "strehl_at_zero_rms", "value": strehl(0.0), "expected": 1.0, "passed": math.isclose(strehl(0.0), 1.0)})
-    rows.append({"check": "strehl_monotonic", "value": strehl(0.15) < strehl(0.05), "expected": True, "passed": strehl(0.15) < strehl(0.05)})
-    rows.append({"check": "fitting_error_pitch_monotonic", "value": fitting_error(0.32, 0.16) > fitting_error(0.16, 0.16), "expected": True, "passed": fitting_error(0.32, 0.16) > fitting_error(0.16, 0.16)})
-    rows.append({"check": "servo_error_delay_monotonic", "value": servo_error(4.0, 4.0) > servo_error(2.0, 4.0), "expected": True, "passed": servo_error(4.0, 4.0) > servo_error(2.0, 4.0)})
+
+    rows.extend([
+        {"check": "modal_gain_zero_removes_none", "value": modal_residual(0.2, 0.0), "expected": 0.2, "passed": math.isclose(modal_residual(0.2, 0.0), 0.2)},
+        {"check": "modal_gain_one_removes_all_modal_phase", "value": modal_residual(0.2, 1.0), "expected": 0.0, "passed": math.isclose(modal_residual(0.2, 1.0), 0.0)},
+        {"check": "rss_is_quadrature", "value": rss(3.0, 4.0), "expected": 5.0, "passed": math.isclose(rss(3.0, 4.0), 5.0)},
+        {"check": "strehl_at_zero_rms", "value": strehl(0.0), "expected": 1.0, "passed": math.isclose(strehl(0.0), 1.0)},
+        {"check": "strehl_monotonic", "value": strehl(0.15) < strehl(0.05), "expected": True, "passed": strehl(0.15) < strehl(0.05)},
+        {"check": "fitting_error_pitch_monotonic", "value": fitting_error(0.32, 0.16) > fitting_error(0.16, 0.16), "expected": True, "passed": fitting_error(0.32, 0.16) > fitting_error(0.16, 0.16)},
+        {"check": "servo_error_delay_monotonic", "value": servo_error(4.0, 4.0) > servo_error(2.0, 4.0), "expected": True, "passed": servo_error(4.0, 4.0) > servo_error(2.0, 4.0)},
+    ])
+
     with output.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=["check", "value", "expected", "passed"])
         writer.writeheader()
