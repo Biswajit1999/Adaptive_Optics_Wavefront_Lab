@@ -60,9 +60,10 @@ Open `index.html` in a modern browser.
 ```bash
 python tools/validate_model.py
 node tools/validate_fourier_psf.js
+node tools/validate_html_contract.js
 ```
 
-The Python script checks Zernike RMS normalization, gain limits, RSS behaviour, and compact scaling laws. The Node script checks clear and obstructed flat-pupil peak invariants and verifies that a phase perturbation reduces the direct peak.
+The Python script checks Zernike RMS normalization, gain limits, RSS behaviour, and compact scaling laws. The Fourier Node script checks clear and obstructed flat-pupil peak invariants and verifies that a phase perturbation reduces the direct peak. The HTML contract script checks that the browser document has a single authoritative lab structure and preserves the science-boundary labels.
 
 ## Science and visualisation contract
 
