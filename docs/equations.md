@@ -1,67 +1,51 @@
-# Equations and Assumptions
+# AO Data Products And Model Equations
 
-## Zernike Expansion
+## Observation Layer
 
-The pupil wavefront is modelled as a weighted sum of low-order Zernike modes:
-
-```text
-W(rho, theta) = sum a_j Z_j(rho, theta)
-```
-
-The implemented modes are RMS-normalised over a circular pupil in a Noll-style convention:
+The default view is sourced from the released CIAO AOT FITS product. The displayed telemetry
+extensions are:
 
 ```text
-Defocus:      sqrt(3) (2 rho^2 - 1)
-Astigmatism:  sqrt(6) rho^2 cos(2 theta)
-Coma:         sqrt(8) (3 rho^3 - 2 rho) cos(theta)
-Trefoil:      sqrt(8) rho^3 cos(3 theta)
+GRADIENTS       Shack-Hartmann measured slopes, dimensions [frame, axis, subaperture]
+INTENSITIES     Shack-Hartmann subaperture intensity, dimensions [frame, subaperture]
+HODM POSITIONS  Recorded high-order deformable-mirror commands, dimensions [frame, actuator]
 ```
 
-The coefficients are therefore interpreted as approximate wavefront RMS amplitudes in waves when modes are orthogonal.
+The browser reduction selects every fiftieth of the 15,000 released loop frames. WebGL colour
+normalisation is a display transformation only. The observation mode does not transform slope
+measurements into wavefront phase or PSF values.
 
-## Correction Model
+## Optional Noll-Indexed Wavefront
 
-The adaptive optics correction is represented as a single scalar loop gain:
+Simulation mode evaluates unit-RMS Zernike polynomials over a circular pupil:
 
 ```text
-W_residual = (1 - gain) W_input
+W(rho, theta, t) = sum_j a_j(t) Z_j(rho, theta)
 ```
 
-This is intentionally simple. It represents ideal modal correction with no sensor noise, actuator fitting error, temporal delay, or non-common-path aberration.
+Controlled terms use Noll indices `J4=(2,0)`, `J5=(2,-2)`, `J6=(2,2)`, `J7=(3,-1)`,
+`J8=(3,1)` and `J11=(4,0)`. Coefficients are model optical path error in waves RMS.
 
-## Strehl Ratio
+## Optional Modal PID Deformable Mirror
 
-The project uses the extended Marechal approximation:
+For each simulated coefficient, a latency-delayed and noise-perturbed residual drives:
 
 ```text
-S ~= exp[-sigma_phi^2]
+e_j[k] = a_j[k] - u_j[k]
+I_j[k] = I_j[k-1] + e_j[k] dt
+u_j[k+1] = u_j[k] + Kp e_j[k] + Ki I_j[k] + Kd (e_j[k] - e_j[k-1]) / dt
 ```
 
-where phase RMS is:
+The simulated pupil residual is `W_res = W_input - W_DM`.
+
+## Optional Image-Quality Products
+
+For simulated residual RMS in waves, the model reports:
 
 ```text
-sigma_phi = 2 pi sigma_waves
+S = exp[-(2 pi sigma_res)^2]
+PSF = | FFT2 { P(rho,theta) exp[i 2 pi W_res(rho,theta)] } |^2
 ```
 
-so:
-
-```text
-S ~= exp[-(2 pi sigma_waves)^2]
-```
-
-## Simplified AO Error Budget
-
-The browser combines residual terms in quadrature:
-
-```text
-sigma_total = sqrt(sigma_modal^2 + sigma_fit^2 + sigma_servo^2 + sigma_wfs^2)
-```
-
-The fitting and servo-lag terms use Kolmogorov-style scaling intuition:
-
-```text
-sigma_fit proportional to (d / r0)^(5/6)
-sigma_servo proportional to (tau_delay / tau0)^(5/6)
-```
-
-where `d` is actuator pitch, `r0` is the Fried parameter, `tau_delay` is loop delay, and `tau0` is atmospheric coherence time. Coefficients are illustrative and chosen for interactive scaling, not calibrated instrument prediction.
+Neither equation is applied to the released CIAO slope matrices without a calibrated
+reconstruction pipeline.

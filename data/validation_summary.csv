@@ -1,9 +1,11 @@
 check,value,expected,passed
-defocus_rms_normalisation,0.9998785321934899,1.0,True
-astig_rms_normalisation,0.9993841236187285,1.0,True
-coma_rms_normalisation,0.9998207636567494,1.0,True
-trefoil_rms_normalisation,0.9998160220512647,1.0,True
-strehl_at_zero_rms,1.0,1.0,True
-strehl_monotonic,True,True,True
-fitting_error_pitch_monotonic,True,True,True
-servo_error_delay_monotonic,True,True,True
+J4_unit_rms,1.0001269315428243,1.0,True
+J5_unit_rms,1.0000283640792271,1.0,True
+J6_unit_rms,1.000226728404802,1.0,True
+J7_unit_rms,1.000189350410328,1.0,True
+J8_unit_rms,1.0001893504103263,1.0,True
+J11_unit_rms,1.0002500805561507,1.0,True
+Noll_J4_is_defocus,Defocus,Defocus,True
+modal_orthogonality,0.0004900136426948217,0.0,True
+strehl_zero_rms,1.0,1.0,True
+strehl_monotonic,0.41136910735062493,< 0.906018055788923,True

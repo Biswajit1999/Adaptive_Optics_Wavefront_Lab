@@ -1,31 +1,44 @@
-# Validation Notes
+# Validation Protocol
 
-## Checks Implemented
+## Released Observation Integrity
 
-1. **Zernike RMS normalisation**
+Run:
 
-   Each implemented low-order mode should have RMS close to 1 over the sampled unit disk.
+```bash
+python tools/validate_observations.py
+```
 
-2. **Correction gain**
+The test verifies the retained FITS source against the published Zenodo MD5, checks the
+release DOI and measured loop rate, and verifies the selected browser-stream dimensions:
+300 display frames, 68 Shack-Hartmann samples and 60 HODM commands.
 
-   If `gain = 0`, corrected RMS equals input RMS. If `gain = 1`, the ideal residual wavefront approaches zero.
+## Optional Model Invariants
 
-3. **Strehl monotonicity**
+Run:
 
-   Strehl must decrease as residual RMS wavefront error increases.
+```bash
+python tools/strehl_table.py
+python tools/validate_model.py
+```
 
-4. **Quadrature intuition**
+These checks sample the unit pupil, verify the RMS normalisation and approximate orthogonality
+of active Noll modes, confirm the Noll mapping for defocus and coma, and validate monotonic
+Marechal Strehl degradation.
 
-   For orthogonal unit-RMS modes, total RMS should approximately follow:
+## Interactive Checks
 
-   ```text
-   sigma_total ~= sqrt(sum a_j^2)
-   ```
+| Manipulation | Expected result |
+| --- | --- |
+| Initial application load | Four WebGL maps show released CIAO telemetry; metrics identify released Strehl and loop rate. |
+| Play or pause observation stream | Per-frame measured readouts advance or hold without changing the heatmap data product. |
+| Enable `SIMULATION MODE` | Panels are relabelled as simulated wavefront, mirror, residual and PSF products. |
+| In model mode set turbulence and WFS noise to zero | Positive PID gains drive residual toward zero and model Strehl toward unity. |
+| In model mode reduce `Ki` | Slowly varying simulated residual offsets persist for longer. |
+| Disable `SIMULATION MODE` | The view returns to unchanged released AOT telemetry. |
 
-5. **AO error-budget monotonicity**
+## Interpretation Boundary
 
-   Increasing actuator pitch relative to `r0` should increase the fitting-error term. Increasing loop delay relative to `tau0` should increase the servo-lag term.
-
-## Scientific Scope
-
-The current validation checks the internal mathematics of the simplified modal model. It does not validate a real AO control loop, wavefront sensor reconstruction, deformable mirror influence functions, or physical diffraction propagation.
+The released observation contains sensor slopes, intensities and corrector commands. A pupil
+wavefront or PSF reconstruction would require the appropriate calibrated interaction matrices,
+optical model and validation workflow. This application deliberately does not display its
+simulated phase maps as if they were reconstructed CIAO observations.

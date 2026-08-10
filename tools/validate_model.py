@@ -1,4 +1,4 @@
-"""Validate Zernike normalisation and compact AO scaling conventions."""
+"""Validate Noll-index Zernike and Marechal relationships used by the AO worker."""
 
 from __future__ import annotations
 
@@ -6,81 +6,111 @@ import csv
 import math
 from pathlib import Path
 
+NOLL = {
+    4: (2, 0, "Defocus"),
+    5: (2, -2, "Astigmatism -2"),
+    6: (2, 2, "Astigmatism +2"),
+    7: (3, -1, "Coma -1"),
+    8: (3, 1, "Coma +1"),
+    11: (4, 0, "Primary spherical"),
+}
 
-def zernike(x: float, y: float, mode: str) -> float | None:
-    rho2 = x * x + y * y
-    if rho2 > 1:
+
+def radial(n: int, absolute_m: int, rho: float) -> float:
+    value = 0.0
+    for s in range((n - absolute_m) // 2 + 1):
+        value += (
+            (-1) ** s
+            * math.factorial(n - s)
+            / (
+                math.factorial(s)
+                * math.factorial((n + absolute_m) // 2 - s)
+                * math.factorial((n - absolute_m) // 2 - s)
+            )
+            * rho ** (n - 2 * s)
+        )
+    return value
+
+
+def zernike(j: int, x: float, y: float) -> float | None:
+    rho = math.hypot(x, y)
+    if rho > 1.0:
         return None
-    rho = math.sqrt(rho2)
+    n, m, _ = NOLL[j]
+    normalisation = math.sqrt(n + 1) if m == 0 else math.sqrt(2 * (n + 1))
     theta = math.atan2(y, x)
-    if mode == "defocus":
-        return math.sqrt(3) * (2 * rho**2 - 1)
-    if mode == "astig":
-        return math.sqrt(6) * rho**2 * math.cos(2 * theta)
-    if mode == "coma":
-        return math.sqrt(8) * (3 * rho**3 - 2 * rho) * math.cos(theta)
-    if mode == "trefoil":
-        return math.sqrt(8) * rho**3 * math.cos(3 * theta)
-    raise ValueError(mode)
+    angular = 1.0 if m == 0 else math.cos(m * theta) if m > 0 else math.sin(abs(m) * theta)
+    return normalisation * radial(n, abs(m), rho) * angular
 
 
-def rms_mode(mode: str, samples: int = 301) -> float:
+def inner_product(first: int, second: int, samples: int = 401) -> float:
     total = 0.0
     count = 0
-    for ix in range(samples):
-        x = 2 * ix / (samples - 1) - 1
-        for iy in range(samples):
-            y = 2 * iy / (samples - 1) - 1
-            value = zernike(x, y, mode)
-            if value is not None:
-                total += value * value
+    for iy in range(samples):
+        y = 2.0 * (iy + 0.5) / samples - 1.0
+        for ix in range(samples):
+            x = 2.0 * (ix + 0.5) / samples - 1.0
+            first_value = zernike(first, x, y)
+            if first_value is not None:
+                total += first_value * zernike(second, x, y)  # type: ignore[operator]
                 count += 1
-    return math.sqrt(total / count)
+    return total / count
 
 
 def strehl(rms_waves: float) -> float:
-    return math.exp(-((2 * math.pi * rms_waves) ** 2))
-
-
-def fitting_error(pitch: float, r0: float) -> float:
-    return 0.28 * (pitch / r0) ** (5 / 6) / (2 * math.pi)
-
-
-def servo_error(delay: float, tau0: float) -> float:
-    return 0.30 * (delay / tau0) ** (5 / 6) / (2 * math.pi)
-
-
-def modal_residual(input_rms: float, gain: float) -> float:
-    return abs(1.0 - gain) * input_rms
-
-
-def rss(*terms: float) -> float:
-    return math.sqrt(sum(term * term for term in terms))
+    return math.exp(-((2.0 * math.pi * rms_waves) ** 2))
 
 
 def main() -> None:
-    modes = ["defocus", "astig", "coma", "trefoil"]
+    rows: list[dict[str, object]] = []
+    for j in NOLL:
+        rms_squared = inner_product(j, j)
+        rows.append(
+            {
+                "check": f"J{j}_unit_rms",
+                "value": math.sqrt(rms_squared),
+                "expected": 1.0,
+                "passed": abs(math.sqrt(rms_squared) - 1.0) < 0.01,
+            }
+        )
+    maximum_cross_term = max(abs(inner_product(4, j)) for j in (5, 6, 7, 8, 11))
+    rows.extend(
+        [
+            {
+                "check": "Noll_J4_is_defocus",
+                "value": NOLL[4][2],
+                "expected": "Defocus",
+                "passed": NOLL[4] == (2, 0, "Defocus"),
+            },
+            {
+                "check": "modal_orthogonality",
+                "value": maximum_cross_term,
+                "expected": 0.0,
+                "passed": maximum_cross_term < 0.01,
+            },
+            {
+                "check": "strehl_zero_rms",
+                "value": strehl(0.0),
+                "expected": 1.0,
+                "passed": strehl(0.0) == 1.0,
+            },
+            {
+                "check": "strehl_monotonic",
+                "value": strehl(0.15),
+                "expected": f"< {strehl(0.05)}",
+                "passed": strehl(0.15) < strehl(0.05),
+            },
+        ]
+    )
     output = Path(__file__).resolve().parents[1] / "data" / "validation_summary.csv"
-    rows = []
-    for mode in modes:
-        rms = rms_mode(mode)
-        rows.append({"check": f"{mode}_rms_normalisation", "value": rms, "expected": 1.0, "passed": abs(rms - 1.0) < 0.02})
-
-    rows.extend([
-        {"check": "modal_gain_zero_removes_none", "value": modal_residual(0.2, 0.0), "expected": 0.2, "passed": math.isclose(modal_residual(0.2, 0.0), 0.2)},
-        {"check": "modal_gain_one_removes_all_modal_phase", "value": modal_residual(0.2, 1.0), "expected": 0.0, "passed": math.isclose(modal_residual(0.2, 1.0), 0.0)},
-        {"check": "rss_is_quadrature", "value": rss(3.0, 4.0), "expected": 5.0, "passed": math.isclose(rss(3.0, 4.0), 5.0)},
-        {"check": "strehl_at_zero_rms", "value": strehl(0.0), "expected": 1.0, "passed": math.isclose(strehl(0.0), 1.0)},
-        {"check": "strehl_monotonic", "value": strehl(0.15) < strehl(0.05), "expected": True, "passed": strehl(0.15) < strehl(0.05)},
-        {"check": "fitting_error_pitch_monotonic", "value": fitting_error(0.32, 0.16) > fitting_error(0.16, 0.16), "expected": True, "passed": fitting_error(0.32, 0.16) > fitting_error(0.16, 0.16)},
-        {"check": "servo_error_delay_monotonic", "value": servo_error(4.0, 4.0) > servo_error(2.0, 4.0), "expected": True, "passed": servo_error(4.0, 4.0) > servo_error(2.0, 4.0)},
-    ])
-
     with output.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=["check", "value", "expected", "passed"])
         writer.writeheader()
         writer.writerows(rows)
-    print(f"Wrote {output}")
+    failures = [row["check"] for row in rows if not row["passed"]]
+    if failures:
+        raise SystemExit(f"Validation failed: {', '.join(str(item) for item in failures)}")
+    print(f"Validated {len(rows)} adaptive-optics invariants; wrote {output}")
 
 
 if __name__ == "__main__":

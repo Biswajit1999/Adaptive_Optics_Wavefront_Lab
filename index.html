@@ -3,99 +3,151 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Interactive adaptive optics wavefront laboratory with pupil geometry, Fourier PSF and MTF diagnostics.">
-    <title>Adaptive Optics Wavefront Lab</title>
+    <meta name="theme-color" content="#0b0f19">
+    <meta
+      name="description"
+      content="Observation-first adaptive optics telemetry console for released ESO CIAO AOT data with optional Noll-index PID modelling."
+    >
+    <title>Adaptive Optics Wavefront Lab | CIAO AOT Telemetry Console</title>
+    <link rel="icon" href="data:,">
     <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/app.js" defer></script>
   </head>
   <body>
-    <div class="page-glow" aria-hidden="true"></div>
-    <main class="shell">
-      <header class="hero" id="top">
-        <div class="hero__copy">
-          <p class="eyebrow"><span class="signal-dot" aria-hidden="true"></span>Instrumentation / wavefront control</p>
-          <h1>Adaptive optics<br><span>wavefront laboratory</span></h1>
-          <p class="hero__lede">Trace a defined low-order pupil phase through ideal modal correction, selected aperture geometry, a sampled Fourier point-spread function, and an optical-transfer diagnostic.</p>
-          <div class="hero__actions">
-            <a class="button button--primary" href="#laboratory">Enter laboratory <span aria-hidden="true">↓</span></a>
-            <button id="pauseHeroButton" class="button button--quiet" type="button" aria-pressed="false">Pause visual layer</button>
-          </div>
-          <dl class="hero__facts">
-            <div><dt>Representation</dt><dd>phase-only</dd></div>
-            <div><dt>Transform</dt><dd>sampled 2D FFT</dd></div>
-            <div><dt>Scope</dt><dd>monochromatic</dd></div>
-          </dl>
-        </div>
-        <section class="hero__stage" aria-label="Control-linked optical context">
-          <canvas id="aoHeroCanvas" aria-label="Animated optical context driven by active control settings"></canvas>
-          <div class="hero__stage-frame" aria-hidden="true"></div>
-          <div class="hero__telemetry">
-            <div class="hero__telemetry-head"><span>LIVE MODEL STATE</span><strong id="heroLiveState">live modal correction context</strong></div>
-            <div class="hero__telemetry-grid">
-              <div><span>input RMS</span><strong id="heroInputRms">0.000 waves</strong></div>
-              <div><span>modal RMS</span><strong id="heroResidualRms">0.000 waves</strong></div>
-              <div><span>direct peak</span><strong id="heroDirectPeak">0.000</strong></div>
-            </div>
-            <p>Visual context only. The phase maps, PSF, MTF, and error budget below are the authoritative model outputs.</p>
-          </div>
+    <div class="instrument">
+      <header class="topbar">
+        <section class="brand">
+          <p>AOT TELEMETRY RELEASE / ESO CIAO1 / CLOSED-LOOP OBSERVATION</p>
+          <h1>AO WAVEFRONT LAB</h1>
+          <span>RELEASED WFS AND MIRROR STREAMS FIRST / OPTIONAL NOLL-PID MODEL</span>
         </section>
+        <dl class="health">
+          <div><dt>ENGINE</dt><dd><i id="engine-light"></i><span id="engine">BOOT</span></dd></div>
+          <div><dt>UTC</dt><dd id="utc">--:--:--</dd></div>
+          <div><dt>FRAME RATE</dt><dd id="fps">-- FPS</dd></div>
+          <div><dt>DATA TIME</dt><dd id="loop-time">-- s</dd></div>
+        </dl>
+        <nav>
+          <button id="run" class="on" type="button">PAUSE STREAM</button>
+          <button id="reset" type="button">RESET MODEL</button>
+          <button id="defaults" type="button">DEFAULTS</button>
+        </nav>
       </header>
 
-      <section class="metrics" aria-label="Adaptive optics summary">
-        <div><span>Input modal RMS</span><strong id="inputRms">0.00 waves</strong><small>selected phase coefficients</small></div>
-        <div><span>Corrected modal RMS</span><strong id="outputRms">0.00 waves</strong><small>ideal scalar modal response</small></div>
-        <div><span>Direct PSF peak</span><strong id="directStrehl">1.00</strong><small>matching ideal pupil reference</small></div>
-        <div><span>Approx. Marechal Strehl</span><strong id="strehl">1.00</strong><small>low-aberration diagnostic</small></div>
-        <div><span>Modal loop gain</span><strong id="gainReadout">0.70</strong><small>phase-only correction term</small></div>
-      </section>
-
-      <section id="laboratory" class="layout">
-        <aside class="panel control-panel">
-          <div class="panel__heading"><span>CONTROL RACK</span><h2>Optical state</h2><p>Every slider updates the pupil and Fourier diagnostics at the same time.</p></div>
-          <section class="control-group">
-            <div class="control-group__head"><span>01</span><h3>Low-order phase</h3></div>
-            <label>Defocus <output id="defocusOut">0.25 waves</output><input id="defocus" type="range" min="-1" max="1" value="0.25" step="0.01"></label>
-            <label>Astigmatism <output id="astigOut">0.35 waves</output><input id="astig" type="range" min="-1" max="1" value="0.35" step="0.01"></label>
-            <label>Coma <output id="comaOut">0.30 waves</output><input id="coma" type="range" min="-1" max="1" value="0.30" step="0.01"></label>
-            <label>Trefoil <output id="trefoilOut">0.18 waves</output><input id="trefoil" type="range" min="-1" max="1" value="0.18" step="0.01"></label>
-            <label>Modal loop gain <output id="gainOut">0.70</output><input id="gain" type="range" min="0" max="1" value="0.7" step="0.01"></label>
-          </section>
-          <section class="control-group">
-            <div class="control-group__head"><span>02</span><h3>Pupil geometry</h3></div>
-            <label>Central obstruction radius <output id="obscurationOut">0.28 R</output><input id="obscuration" type="range" min="0" max="0.60" value="0.28" step="0.01"></label>
-            <label>Four-vane half width <output id="spiderOut">0.015 R</output><input id="spiderWidth" type="range" min="0" max="0.08" value="0.015" step="0.001"></label>
-          </section>
-          <section class="control-group control-group--last">
-            <div class="control-group__head"><span>03</span><h3>Illustrative error budget</h3></div>
-            <label>Actuator pitch <output id="pitchOut">0.28 m</output><input id="actuatorPitch" type="range" min="0.08" max="0.8" value="0.28" step="0.01"></label>
-            <label>Fried parameter r0 <output id="r0Out">0.16 m</output><input id="friedR0" type="range" min="0.05" max="0.5" value="0.16" step="0.01"></label>
-            <label>Loop delay <output id="delayOut">2.0 ms</output><input id="loopDelay" type="range" min="0" max="12" value="2" step="0.1"></label>
-            <label>Coherence time <output id="tau0Out">4.0 ms</output><input id="coherenceTime" type="range" min="1" max="20" value="4" step="0.1"></label>
-            <label>WFS noise <output id="wfsOut">0.030 waves</output><input id="wfsNoise" type="range" min="0" max="0.18" value="0.03" step="0.005"></label>
-          </section>
+      <main class="layout">
+        <aside class="panel controls">
+          <header><h2>CONTROL MATRIX</h2><span>DATA / MODEL BOUNDARY</span></header>
+          <fieldset class="dataset">
+            <legend>OBSERVED AOT PRODUCT</legend>
+            <label>DATASET
+              <select id="dataset">
+                <option value="CIAO1" selected>ESO CIAO1 / AT1 / 2019-12-07</option>
+              </select>
+            </label>
+            <label>PLAYBACK <output id="playbackRate-value">1.00 x</output>
+              <input id="playbackRate" type="range" min="0.25" max="8" step="0.25" value="1">
+            </label>
+            <label class="toggle">SIMULATION MODE <output id="modelOverlay-value">OFF</output>
+              <input id="modelOverlay" type="checkbox">
+            </label>
+            <p class="dataset-note">Zenodo DOI 10.5281/zenodo.8192742 / AOT v1.0.0 / CC BY 4.0</p>
+          </fieldset>
+          <div id="model-controls" class="model-controls inactive">
+            <fieldset>
+              <legend>NOLL MODE INJECTION</legend>
+              <label>J4 / DEFOCUS <output id="z4-value">0.220</output>
+                <input id="z4" type="range" min="-1" max="1" step="0.001" value="0.22">
+              </label>
+              <label>J5 / ASTIG -2 <output id="z5-value">0.120</output>
+                <input id="z5" type="range" min="-1" max="1" step="0.001" value="0.12">
+              </label>
+              <label>J6 / ASTIG +2 <output id="z6-value">-0.180</output>
+                <input id="z6" type="range" min="-1" max="1" step="0.001" value="-0.18">
+              </label>
+              <label>J7 / COMA -1 <output id="z7-value">0.160</output>
+                <input id="z7" type="range" min="-1" max="1" step="0.001" value="0.16">
+              </label>
+              <label>J8 / COMA +1 <output id="z8-value">0.060</output>
+                <input id="z8" type="range" min="-1" max="1" step="0.001" value="0.06">
+              </label>
+              <label>J11 / SPHERICAL <output id="z11-value">0.080</output>
+                <input id="z11" type="range" min="-1" max="1" step="0.001" value="0.08">
+              </label>
+            </fieldset>
+            <fieldset>
+              <legend>MODEL ATMOSPHERE / SENSOR</legend>
+              <label>DYNAMIC SEEING <output id="turbulence-value">0.080 waves</output>
+                <input id="turbulence" type="range" min="0" max="0.6" step="0.001" value="0.08">
+              </label>
+              <label>WFS NOISE <output id="sensorNoise-value">0.002 waves</output>
+                <input id="sensorNoise" type="range" min="0" max="0.1" step="0.001" value="0.002">
+              </label>
+              <label>WAVELENGTH <output id="wavelength-value">1650 nm</output>
+                <input id="wavelength" type="range" min="400" max="2400" step="10" value="1650">
+              </label>
+            </fieldset>
+            <fieldset>
+              <legend>PID CONTROLLER MODEL</legend>
+              <label>PROPORTIONAL Kp <output id="kp-value">0.320</output>
+                <input id="kp" type="range" min="0" max="1.2" step="0.001" value="0.32">
+              </label>
+              <label>INTEGRAL Ki <output id="ki-value">0.060</output>
+                <input id="ki" type="range" min="0" max="1.2" step="0.001" value="0.06">
+              </label>
+              <label>DERIVATIVE Kd <output id="kd-value">0.002</output>
+                <input id="kd" type="range" min="0" max="0.05" step="0.001" value="0.002">
+              </label>
+              <label>LOOP RATE <output id="loopRate-value">200 Hz</output>
+                <input id="loopRate" type="range" min="20" max="1000" step="10" value="200">
+              </label>
+              <label>LATENCY <output id="latency-value">2 frames</output>
+                <input id="latency" type="range" min="0" max="20" step="1" value="2">
+              </label>
+            </fieldset>
+          </div>
         </aside>
 
-        <section class="views">
-          <article class="panel wide error-grid">
-            <div><span>Modal residual</span><strong id="modalResidual">0.000 waves</strong><small>displayed phase response</small></div>
-            <div><span>Fitting term</span><strong id="fittingError">0.000 waves</strong><small>illustrative scalar term</small></div>
-            <div><span>Servo-lag term</span><strong id="servoLag">0.000 waves</strong><small>illustrative scalar term</small></div>
-            <div><span>System RSS residual</span><strong id="totalResidual">0.000 waves</strong><small>diagnostic total</small></div>
+        <section class="science">
+          <section class="metrics">
+            <article><h2 id="metric-a-title">RELEASED STREHL-R</h2><strong id="input-rms">--</strong><span id="metric-a-unit">FITS HEADER</span></article>
+            <article><h2 id="metric-b-title">WFS GRADIENT RMS</h2><strong id="residual-rms">--</strong><span id="metric-b-unit">NATIVE AOT VALUE</span></article>
+            <article><h2 id="metric-c-title">HODM RMS</h2><strong id="strehl">--</strong><span id="metric-c-unit">RECORDED COMMAND</span></article>
+            <article><h2 id="metric-d-title">LOOP RATE</h2><strong id="psf-peak">--</strong><span id="metric-d-unit">RELEASED METADATA</span></article>
+            <article><h2 id="metric-e-title">MEAN FLUX</h2><strong id="servo-error">--</strong><span id="metric-e-unit">SUBAPERTURE INTENSITY</span></article>
+          </section>
+          <section class="heatmaps">
+            <article class="panel view"><header><h2 id="incoming-title">WFS GRADIENT X</h2><span id="incoming-note">68 SUBAPERTURES x RELEASED TIME</span></header><canvas id="incoming"></canvas></article>
+            <article class="panel view"><header><h2 id="mirror-title">WFS GRADIENT Y</h2><span id="mirror-note">68 SUBAPERTURES x RELEASED TIME</span></header><canvas id="mirror"></canvas></article>
+            <article class="panel view"><header><h2 id="residual-title">SUBAPERTURE INTENSITY</h2><span id="residual-note">RECORDED WFS FLUX STREAM</span></header><canvas id="residual"></canvas></article>
+            <article class="panel view psf"><header><h2 id="psf-title">HODM POSITIONS</h2><span id="psf-note">60 RECORDED ACTUATOR COMMANDS</span></header><canvas id="psf"></canvas></article>
+          </section>
+          <article class="panel history">
+            <header><h2 id="history-title">RELEASED TELEMETRY TREND</h2><span id="history-note">WFS GRADIENT RMS VS SAMPLED AOT TIME</span></header>
+            <canvas id="history"></canvas>
           </article>
-          <article class="panel panel--phase"><div class="panel__title"><span>PHASE PLANE / INPUT</span><h2>Incoming pupil phase</h2></div><canvas id="inputCanvas" width="520" height="520"></canvas></article>
-          <article class="panel panel--phase"><div class="panel__title"><span>PHASE PLANE / MODAL</span><h2>Modal-corrected pupil</h2></div><canvas id="correctedCanvas" width="520" height="520"></canvas></article>
-          <article class="panel wide"><div class="panel__title"><span>FOURIER PLANE / DIFFRACTION</span><h2>Fraunhofer PSF from selected pupil</h2></div><canvas id="psfCanvas" width="980" height="300"></canvas><p class="panel-note">Direct peaks use an unaberrated pupil with the same obstruction and vane geometry. The displayed peak metric is not the same as the compact Marechal diagnostic.</p></article>
-          <article class="panel wide"><div class="panel__title"><span>FREQUENCY DOMAIN / RESPONSE</span><h2>Azimuthal modulation transfer function</h2></div><canvas id="mtfCanvas" width="980" height="260"></canvas><p class="panel-note">Radial mean of the normalised sampled OTF. Monochromatic and not a calibrated telescope MTF.</p></article>
-          <article class="panel wide"><div class="panel__title"><span>DIAGNOSTIC / ERROR BUDGET</span><h2>Illustrative residual error budget</h2></div><canvas id="budgetCanvas" width="980" height="300"></canvas><p class="panel-note">The scalar fitting, servo-lag, and WFS-noise terms are not injected into the displayed pupil or PSF.</p></article>
         </section>
-      </section>
 
-      <section class="method-strip" aria-label="Model boundary">
-        <div><span>MODEL BOUNDARY</span><strong>Not an end-to-end adaptive-optics simulator.</strong></div>
-        <p>No measured telescope pupil, turbulence time series, deformable-mirror influence functions, detector sampling, amplitude errors, or closed-loop WFS reconstruction are included.</p>
-      </section>
-    </main>
-    <footer class="site-footer"><span>Adaptive Optics Wavefront Lab</span><span>Biswajit Jana / 2026</span><span>Phase → pupil → PSF → MTF</span></footer>
-    <script src="assets/js/optical-hero.js"></script>
-    <script src="assets/js/fourier-optics.js"></script>
+        <aside class="right">
+          <article class="panel readout">
+            <header><h2 id="table-title">OBSERVATION CHANNELS</h2><span id="table-note">AOT FITS EXTENSIONS</span></header>
+            <table>
+              <thead><tr><th id="col-a">STREAM</th><th id="col-b">N</th><th id="col-c">TYPE</th><th id="col-d">CURRENT</th></tr></thead>
+              <tbody id="mode-table"></tbody>
+            </table>
+          </article>
+          <article class="panel equations">
+            <header><h2>OPTIONAL MODEL KERNEL</h2><span>NOT OBSERVED TELEMETRY</span></header>
+            <p>W = sum a_j Z_j(rho, theta), using Noll indices</p>
+            <p>u[k] = u[k-1] + Kp e + Ki sum(e dt) + Kd de/dt</p>
+            <p>S = exp[-(2 pi sigma_res)^2]</p>
+          </article>
+          <article class="panel events">
+            <header><h2>EVENT LOG</h2><span>DATA / WORKER STATUS</span></header>
+            <ol id="log"><li>Loading released CIAO AOT telemetry...</li></ol>
+          </article>
+        </aside>
+      </main>
+      <footer>AWL / OBSERVATION-FIRST AO INSTRUMENT <span id="status">LOADING AOT PRODUCT</span> WEBGL MAPS / WORKER MODEL / ZERO BUILD</footer>
+    </div>
   </body>
 </html>
