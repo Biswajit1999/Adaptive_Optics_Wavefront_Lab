@@ -15,6 +15,11 @@ The browser reduction selects every fiftieth of the 15,000 released loop frames.
 normalisation is a display transformation only. The observation mode does not transform slope
 measurements into wavefront phase or PSF values.
 
+The resulting effective sampling rate is 9.99924 Hz and the reduced Nyquist
+frequency is 4.99962 Hz. The full-rate audit finds substantial above-Nyquist
+power for all three displayed scalar diagnostics, so the sampled sequence must
+not be used to infer temporal spectra or loop bandwidth.
+
 ## Optional Noll-Indexed Wavefront
 
 Simulation mode evaluates unit-RMS Zernike polynomials over a circular pupil:

@@ -5,12 +5,15 @@
 Run:
 
 ```bash
+python research/audit_telemetry.py
 python tools/validate_observations.py
 ```
 
-The test verifies the retained FITS source against the published Zenodo MD5, checks the
-release DOI and measured loop rate, and verifies the selected browser-stream dimensions:
-300 display frames, 68 Shack-Hartmann samples and 60 HODM commands.
+The audit verifies the retained FITS against MD5 and SHA-256 receipts, compares
+all browser values with the corresponding FITS samples, evaluates declared
+distribution gates, and quantifies full-rate power above the reduced Nyquist
+limit. The compact validator then checks the frozen evidence boundary and stream
+dimensions.
 
 ## Optional Model Invariants
 

@@ -4,26 +4,29 @@ Contributions are welcome across the optical model, browser implementation, vali
 
 ## Project boundary
 
-This repository is an educational Fourier-optics laboratory. It is not a calibrated observatory model. Contributions must preserve the distinction between:
+This repository is an observation-first telemetry viewer with an optional educational Fourier-optics model. It is not a calibrated observatory model. Contributions must preserve the distinction between:
 
-- the displayed pupil phase, PSF, and MTF;
-- the separate compact residual-error diagnostic;
-- idealised modal gain;
-- real wavefront-sensor and deformable-mirror behaviour, which is not currently implemented.
+- released WFS gradients, intensities, and HODM commands;
+- the stride-50 browser sample and the full-rate retained FITS;
+- generated pupil phase, PSF, and Maréchal diagnostics in simulation mode;
+- real wavefront reconstruction and controller identification, which are not implemented.
 
 Do not introduce labels, animations, or numerical claims that imply measured telescope performance or hardware that the model does not contain.
 
 ## Local validation
 
-Open `index.html` in a modern browser, then run the existing checks:
+Serve `index.html` over HTTP in a modern browser, then run the complete checks:
 
 ```bash
+python -m pip install -r requirements.txt
+python research/audit_telemetry.py
+python tools/validate_observations.py
 python tools/validate_model.py
-node tools/validate_fourier_psf.js
-node tools/validate_html_contract.js
+npm run check
+git diff --exit-code -- research/generated data/validation_summary.csv
 ```
 
-All three commands should pass before a pull request is opened.
+All commands should pass before a pull request is opened.
 
 ## Scientific changes
 
@@ -31,14 +34,14 @@ When changing equations, sampling, pupil geometry, or diagnostics:
 
 - state the physical assumption being modified;
 - document units, normalisation, and parameter bounds;
-- preserve the matching ideal-pupil reference used for direct peak ratios;
+- update `METHODS.md` and `CLAIMS.md` when an inference boundary changes;
 - keep the compact Marechal diagnostic separate from the computed PSF peak;
 - add or update an independent validation check;
 - describe the regime where any approximation is valid.
 
 ## Interface changes
 
-- Keep the pupil, phase, PSF, MTF, and residual-budget outputs readable.
+- Keep observed telemetry and generated model products visibly distinct.
 - Preserve keyboard access and meaningful labels.
 - Test the layout at desktop and narrow-screen widths.
 - Avoid visual effects that imply unmodelled turbulence, telemetry, or live observatory data.
@@ -68,7 +71,7 @@ When changing equations, sampling, pupil geometry, or diagnostics:
 Please include:
 
 - browser and operating system;
-- the selected aberration and pupil settings;
+- observation or simulation mode and selected model settings;
 - steps to reproduce;
 - expected and observed behaviour;
 - console output or screenshots when relevant;

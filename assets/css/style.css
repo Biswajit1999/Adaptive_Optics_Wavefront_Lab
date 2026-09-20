@@ -127,6 +127,32 @@ legend {
   border-top:1px solid rgba(53,215,229,.18); color:var(--muted); font:.58rem/1.55 var(--mono);
   letter-spacing:.05em; margin:.75rem 0 0; padding-top:.62rem;
 }
+
+.sampling-boundary {
+  color: #f4bf75;
+  line-height: 1.45;
+}
+
+.evidence p {
+  margin: 0;
+  padding: 10px 12px 0;
+  color: #b9c8d8;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.evidence strong { color: #eef7ff; }
+
+.evidence img {
+  display: block;
+  width: calc(100% - 24px);
+  height: auto;
+  margin: 12px;
+  border: 1px solid rgba(81, 109, 143, .35);
+}
+
+.evidence .evidence-links { padding-bottom: 12px; }
+.evidence a { color: #35d7e5; }
 .toggle { align-items:center; display:flex; justify-content:space-between; }
 .toggle output { color:var(--cyan); margin-left:auto; margin-right:.5rem; }
 input[type=checkbox] { accent-color:var(--cyan); height:1rem; width:1rem; }

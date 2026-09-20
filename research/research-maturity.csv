@@ -1,0 +1,12 @@
+dimension,before,after,maximum,evidence
+Research question and hypotheses,3,9,10,Predeclared provenance distribution and temporal gates
+Source provenance,9,10,10,DOI plus MD5 and SHA-256 receipts
+Observation integrity,5,10,10,Exact 103800-value FITS-to-browser parity audit
+Sampling validity,1,10,10,Full-rate spectral audit and failed temporal gate disclosed
+Numerical model validation,7,9,10,Six-mode Noll and PID invariants share deployed core
+Test-to-implementation parity,3,9,10,Worker imports the directly tested science core
+Reproducibility,6,10,10,Pinned environment deterministic evidence and freshness gate
+Claims and limitations,8,10,10,Machine-readable claim ledger and explicit non-claims
+Continuous verification,5,9,10,Immutable actions and complete main/PR verification
+Release and public evidence,4,9,10,Versioned reviewer surface and release assets
+TOTAL,51,95,100,Repository evidence rubric

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="520" viewBox="0 0 960 520" role="img" aria-labelledby="title desc">
+  <title id="title">CIAO1 stride-50 temporal-fidelity audit</title>
+  <desc id="desc">Horizontal bars show 20.89 percent of gradient RMS power, 9.19 percent of command RMS power, and 64.46 percent of mean-flux power above the browser product's five hertz Nyquist limit. All exceed the predeclared five percent limit.</desc>
+  <rect width="960" height="520" fill="#08101c"/>
+  <text x="70" y="62" fill="#eef7ff" font-family="Arial, sans-serif" font-size="28" font-weight="600">Stride-50 browser sample fails the temporal-fidelity gate</text>
+  <text x="70" y="94" fill="#9fb2c7" font-family="Arial, sans-serif" font-size="16">Fraction of full-rate windowed power above reduced Nyquist (5.000 Hz)</text>
+  <g stroke="#29405b" stroke-width="1">
+    <line x1="280" y1="130" x2="280" y2="410"/>
+    <line x1="432" y1="130" x2="432" y2="410"/>
+    <line x1="584" y1="130" x2="584" y2="410"/>
+    <line x1="736" y1="130" x2="736" y2="410"/>
+    <line x1="888" y1="130" x2="888" y2="410"/>
+  </g>
+  <g fill="#9fb2c7" font-family="Arial, sans-serif" font-size="14" text-anchor="middle">
+    <text x="280" y="435">0%</text><text x="432" y="435">17.5%</text><text x="584" y="435">35%</text><text x="736" y="435">52.5%</text><text x="888" y="435">70%</text>
+  </g>
+  <line x1="323.4" y1="122" x2="323.4" y2="410" stroke="#ffd166" stroke-width="3" stroke-dasharray="7 6"/>
+  <text x="330" y="146" fill="#ffd166" font-family="Arial, sans-serif" font-size="14">5% predeclared limit</text>
+  <g font-family="Arial, sans-serif" font-size="18">
+    <text x="258" y="206" fill="#eef7ff" text-anchor="end">Gradient RMS</text>
+    <rect x="280" y="174" width="181.4" height="48" fill="#35d7e5"/>
+    <text x="473" y="205" fill="#eef7ff">20.89%</text>
+    <text x="258" y="296" fill="#eef7ff" text-anchor="end">Command RMS</text>
+    <rect x="280" y="264" width="79.8" height="48" fill="#35d7e5"/>
+    <text x="371" y="295" fill="#eef7ff">9.19%</text>
+    <text x="258" y="386" fill="#eef7ff" text-anchor="end">Mean flux</text>
+    <rect x="280" y="354" width="559.8" height="48" fill="#ff7b72"/>
+    <text x="851" y="385" fill="#eef7ff">64.46%</text>
+  </g>
+  <text x="70" y="482" fill="#9fb2c7" font-family="Arial, sans-serif" font-size="15">Result: exact rounded provenance and distributional representativeness pass; temporal-spectrum inference is blocked.</text>
+</svg>

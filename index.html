@@ -51,6 +51,7 @@
               <input id="modelOverlay" type="checkbox">
             </label>
             <p class="dataset-note">Zenodo DOI 10.5281/zenodo.8192742 / AOT v1.0.0 / CC BY 4.0</p>
+            <p class="dataset-note sampling-boundary">Browser view: every 50th frame / 9.999 Hz effective sample rate / 5.000 Hz Nyquist. Sparse overview only—not a temporal-spectrum or closed-loop bandwidth product.</p>
           </fieldset>
           <div id="model-controls" class="model-controls inactive">
             <fieldset>
@@ -135,6 +136,14 @@
               <tbody id="mode-table"></tbody>
             </table>
           </article>
+          <article class="panel evidence" id="research-evidence">
+            <header><h2>DECIMATION AUDIT</h2><span>PREDECLARED GATES / v3.0.0</span></header>
+            <p><strong>FITS → browser parity: PASS.</strong> All 103,800 retained numeric values and 300 frame indices reproduce the selected source frames within the declared six-decimal rounding bound.</p>
+            <p><strong>Distribution gate: PASS.</strong> Mean errors are 0.005–0.041 full-rate SD; largest 5/50/95-percentile errors are 0.012–0.109 full-rate IQR.</p>
+            <p><strong>Temporal gate: FAIL.</strong> Power above the reduced 5 Hz Nyquist is 20.89% for gradient RMS, 9.19% for command RMS, and 64.46% for mean flux.</p>
+            <img src="assets/telemetry-decimation-audit.svg" alt="Bar chart showing power above the browser product Nyquist frequency for gradient RMS, command RMS, and mean flux, all above the five percent temporal-fidelity limit.">
+            <p class="evidence-links"><a href="METHODS.md">Methods</a> / <a href="CLAIMS.md">Claim ledger</a> / <a href="research/generated/telemetry-decimation-audit.json">JSON evidence</a> / <a href="assets/research-maturity-before-after.svg">maturity audit</a></p>
+          </article>
           <article class="panel equations">
             <header><h2>OPTIONAL MODEL KERNEL</h2><span>NOT OBSERVED TELEMETRY</span></header>
             <p>W = sum a_j Z_j(rho, theta), using Noll indices</p>
@@ -147,7 +156,7 @@
           </article>
         </aside>
       </main>
-      <footer>AWL / OBSERVATION-FIRST AO INSTRUMENT <span id="status">LOADING AOT PRODUCT</span> WEBGL MAPS / WORKER MODEL / ZERO BUILD</footer>
+      <footer>AWL v3.0.0 / OBSERVATION-FIRST AO INSTRUMENT <span id="status">LOADING AOT PRODUCT</span> WEBGL MAPS / TESTED WORKER CORE / REVIEWED SNAPSHOT</footer>
     </div>
   </body>
 </html>

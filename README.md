@@ -9,6 +9,23 @@ shows actual Shack-Hartmann wavefront-sensor streams and high-order deformable-m
 Only after the user enables `SIMULATION MODE` does the console present generated pupil phase,
 PID control and point-spread-function products.
 
+## v3.0 research result
+
+The 300-frame browser product is now audited against all 15,000 released CIAO1
+frames. Every retained value passes exact source parity within the declared
+six-decimal rounding. The retained gradient-RMS, command-RMS and mean-flux
+distributions also pass predeclared mean and percentile gates.
+
+The temporal-fidelity null is rejected: 20.89%, 9.19% and 64.46% of full-rate
+windowed power respectively lies above the reduced product's 5 Hz Nyquist
+frequency. The browser data is therefore a sparse visual and distributional
+overview—not evidence for temporal spectra, loop bandwidth, transfer functions,
+or CIAO controller reconstruction. See [METHODS.md](METHODS.md),
+[CLAIMS.md](CLAIMS.md), and the
+[machine-readable audit](research/generated/telemetry-decimation-audit.json).
+
+![Before/after research maturity audit](assets/research-maturity-before-after.svg)
+
 ## Released Telemetry Product
 
 The retained FITS source is:
@@ -75,6 +92,7 @@ Adaptive Optics Wavefront Lab/
   assets/
     css/style.css
     js/app.js                       WebGL presentation and controls
+    js/science-core.js              directly tested Noll/PID/statistics core
     js/physicsWorker.js             AOT telemetry loading and optional model
   data/observations/
     CIAO1_2019-12-06_DATA_EXPO-015808.fits
@@ -88,6 +106,9 @@ Adaptive Optics Wavefront Lab/
     validate_observations.py
     validate_model.py
     strehl_table.py
+  research/
+    audit_telemetry.py              full-rate sampling/provenance experiment
+    generated/                      deterministic JSON and CSV evidence
 ```
 
 The worker has two explicit paths. In observation mode, it loads and scales only released AOT
@@ -159,14 +180,18 @@ retained source FITS file is absent.
 ## Verification
 
 ```bash
+python -m pip install -r requirements.txt
+python research/audit_telemetry.py
 python tools/validate_observations.py
-python tools/strehl_table.py
 python tools/validate_model.py
+npm run check
+git diff --exit-code -- research/generated data/validation_summary.csv
 ```
 
-`validate_observations.py` checks the FITS MD5, release DOI, dimensions and finite telemetry
-content. The model validators test Zernike normalisation, modal orthogonality and the declared
-Marechal relationship. These are integrity and numerical checks, not a CIAO PSF
+The observation audit checks the published MD5, local SHA-256 receipt, exact
+FITS-to-browser value parity, distributional representativeness, and the reduced
+sample's temporal boundary. JavaScript tests call the same science core imported
+by the deployed worker. These are integrity and numerical checks, not a CIAO PSF
 reconstruction.
 
 ## References

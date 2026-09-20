@@ -1,5 +1,4 @@
-// Run with: node tools/validate_html_contract.js
-// Lightweight static contract for the browser document structure.
+// Static contract for the deployed observation-first browser document.
 
 const fs = require('fs');
 const path = require('path');
@@ -26,15 +25,14 @@ expectExactly('html start tag', /<html\b/gi, 1);
 expectExactly('head start tag', /<head\b/gi, 1);
 expectExactly('body start tag', /<body\b/gi, 1);
 expectExactly('main start tag', /<main\b/gi, 1);
-expectExactly('laboratory section', /id="laboratory"/g, 1);
-expectExactly('input phase canvas', /id="inputCanvas"/g, 1);
-expectExactly('corrected phase canvas', /id="correctedCanvas"/g, 1);
-expectExactly('PSF canvas', /id="psfCanvas"/g, 1);
-expectExactly('MTF canvas', /id="mtfCanvas"/g, 1);
-expectExactly('budget canvas', /id="budgetCanvas"/g, 1);
-expectIncludes('central obstruction uses radius wording', 'Central obstruction radius');
-expectIncludes('four-vane control uses half-width wording', 'Four-vane half width');
-expectIncludes('direct PSF and Marechal separation', 'The displayed peak metric is not the same as the compact Marechal diagnostic.');
-expectIncludes('error-budget separation', 'The scalar fitting, servo-lag, and WFS-noise terms are not injected into the displayed pupil or PSF.');
+for (const id of ['incoming', 'mirror', 'residual', 'psf', 'history', 'research-evidence']) {
+  expectExactly(`${id} surface`, new RegExp(`id="${id}"`, 'g'), 1);
+}
+expectIncludes('released data default', 'SIMULATION MODE');
+expectIncludes('effective sample rate', '9.999 Hz effective sample rate');
+expectIncludes('temporal inference boundary', 'not a temporal-spectrum or closed-loop bandwidth product');
+expectIncludes('failed temporal gate', '<strong>Temporal gate: FAIL.</strong>');
+expectIncludes('machine-readable evidence', 'research/generated/telemetry-decimation-audit.json');
+expectIncludes('maturity graph', 'assets/research-maturity-before-after.svg');
 
-console.log('PASS AO HTML structure and science-label contract');
+console.log('PASS observation-first HTML, evidence, and inference-boundary contract');

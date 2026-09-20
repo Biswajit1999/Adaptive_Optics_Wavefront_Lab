@@ -1,9 +1,18 @@
 cff-version: 1.2.0
 message: "If you use this educational research tool, please cite it as below."
 title: "Adaptive Optics Wavefront Lab"
+version: "3.0.0"
+date-released: 2026-09-20
 authors:
   - family-names: "Jana"
     given-names: "Biswajit"
 year: 2026
 license: "MIT"
 repository-code: "https://github.com/Biswajit1999/Adaptive_Optics_Wavefront_Lab"
+url: "https://biswajit1999.github.io/Adaptive_Optics_Wavefront_Lab/"
+keywords:
+  - adaptive optics
+  - telemetry
+  - AOT
+  - reproducible research
+  - Zernike polynomials

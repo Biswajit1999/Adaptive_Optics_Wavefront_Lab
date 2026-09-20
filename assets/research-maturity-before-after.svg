@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="700" viewBox="0 0 1040 700" role="img" aria-labelledby="title desc">
+  <title id="title">Adaptive Optics Wavefront Lab research maturity before and after version 3</title>
+  <desc id="desc">Ten-category audit. Total score increases from 51 to 95 out of 100, led by new observation-integrity, sampling-validity, test-parity, and reproducibility evidence.</desc>
+  <rect width="1040" height="700" fill="#08101c"/>
+  <text x="58" y="54" fill="#eef7ff" font-family="Arial, sans-serif" font-size="28" font-weight="600">Research maturity: baseline 51 → release 95</text>
+  <text x="58" y="83" fill="#9fb2c7" font-family="Arial, sans-serif" font-size="15">Auditable repository-practice rubric; not peer review or scientific-merit scoring</text>
+  <g font-family="Arial, sans-serif" font-size="13">
+    <text x="560" y="112" fill="#9fb2c7">0</text><text x="648" y="112" fill="#9fb2c7">2</text><text x="736" y="112" fill="#9fb2c7">4</text><text x="824" y="112" fill="#9fb2c7">6</text><text x="912" y="112" fill="#9fb2c7">8</text><text x="988" y="112" fill="#9fb2c7">10</text>
+    <g stroke="#29405b" stroke-width="1"><line x1="560" y1="122" x2="560" y2="610"/><line x1="648" y1="122" x2="648" y2="610"/><line x1="736" y1="122" x2="736" y2="610"/><line x1="824" y1="122" x2="824" y2="610"/><line x1="912" y1="122" x2="912" y2="610"/><line x1="1000" y1="122" x2="1000" y2="610"/></g>
+    <g fill="#eef7ff" text-anchor="end">
+      <text x="535" y="151">Question &amp; hypotheses</text><text x="535" y="199">Source provenance</text><text x="535" y="247">Observation integrity</text><text x="535" y="295">Sampling validity</text><text x="535" y="343">Numerical validation</text><text x="535" y="391">Test/implementation parity</text><text x="535" y="439">Reproducibility</text><text x="535" y="487">Claims &amp; limitations</text><text x="535" y="535">Continuous verification</text><text x="535" y="583">Release/public evidence</text>
+    </g>
+    <g fill="#43617f"><rect x="560" y="132" width="132" height="12"/><rect x="560" y="180" width="396" height="12"/><rect x="560" y="228" width="220" height="12"/><rect x="560" y="276" width="44" height="12"/><rect x="560" y="324" width="308" height="12"/><rect x="560" y="372" width="132" height="12"/><rect x="560" y="420" width="264" height="12"/><rect x="560" y="468" width="352" height="12"/><rect x="560" y="516" width="220" height="12"/><rect x="560" y="564" width="176" height="12"/></g>
+    <g fill="#35d7e5"><rect x="560" y="148" width="396" height="12"/><rect x="560" y="196" width="440" height="12"/><rect x="560" y="244" width="440" height="12"/><rect x="560" y="292" width="440" height="12"/><rect x="560" y="340" width="396" height="12"/><rect x="560" y="388" width="396" height="12"/><rect x="560" y="436" width="440" height="12"/><rect x="560" y="484" width="440" height="12"/><rect x="560" y="532" width="396" height="12"/><rect x="560" y="580" width="396" height="12"/></g>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="15"><rect x="58" y="628" width="20" height="12" fill="#43617f"/><text x="87" y="639" fill="#eef7ff">Before: repository at commit 2e09822</text><rect x="390" y="628" width="20" height="12" fill="#35d7e5"/><text x="419" y="639" fill="#eef7ff">After: v3.0.0 evidence contract</text></g>
+  <text x="58" y="674" fill="#9fb2c7" font-family="Arial, sans-serif" font-size="14">Largest change: the 300-frame display is now proven faithful to selected FITS values but explicitly rejected for temporal-dynamics inference.</text>
+</svg>
