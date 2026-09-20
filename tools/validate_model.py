@@ -102,6 +102,9 @@ def main() -> None:
             },
         ]
     )
+    for row in rows:
+        if isinstance(row["value"], float):
+            row["value"] = f"{row['value']:.12g}"
     output = Path(__file__).resolve().parents[1] / "data" / "validation_summary.csv"
     with output.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=["check", "value", "expected", "passed"])

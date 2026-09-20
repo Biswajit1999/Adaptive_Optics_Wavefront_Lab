@@ -1,11 +1,11 @@
 check,value,expected,passed
-J4_unit_rms,1.0001269315428243,1.0,True
-J5_unit_rms,1.0000283640792271,1.0,True
-J6_unit_rms,1.000226728404802,1.0,True
-J7_unit_rms,1.000189350410328,1.0,True
-J8_unit_rms,1.0001893504103263,1.0,True
-J11_unit_rms,1.0002500805561507,1.0,True
+J4_unit_rms,1.00012693154,1.0,True
+J5_unit_rms,1.00002836408,1.0,True
+J6_unit_rms,1.0002267284,1.0,True
+J7_unit_rms,1.00018935041,1.0,True
+J8_unit_rms,1.00018935041,1.0,True
+J11_unit_rms,1.00025008056,1.0,True
 Noll_J4_is_defocus,Defocus,Defocus,True
-modal_orthogonality,0.0004900136426948217,0.0,True
-strehl_zero_rms,1.0,1.0,True
-strehl_monotonic,0.41136910735062493,< 0.906018055788923,True
+modal_orthogonality,0.000490013642695,0.0,True
+strehl_zero_rms,1,1.0,True
+strehl_monotonic,0.411369107351,< 0.906018055788923,True

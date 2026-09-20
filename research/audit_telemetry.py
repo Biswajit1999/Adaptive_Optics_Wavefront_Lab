@@ -45,6 +45,17 @@ def digest(path: Path, algorithm: str) -> str:
     return value.hexdigest()
 
 
+def canonical_numbers(value: object) -> object:
+    """Round published floats to a platform-stable 12 significant digits."""
+    if isinstance(value, float):
+        return float(f"{value:.12g}")
+    if isinstance(value, list):
+        return [canonical_numbers(item) for item in value]
+    if isinstance(value, dict):
+        return {key: canonical_numbers(item) for key, item in value.items()}
+    return value
+
+
 def scalar_series(
     gradients: np.ndarray, intensities: np.ndarray, commands: np.ndarray
 ) -> dict[str, np.ndarray]:
@@ -234,6 +245,7 @@ def main() -> None:
     }
     if not all(math.isfinite(float(row["power_above_reduced_nyquist_fraction"])) for row in rows):
         raise AssertionError("non-finite spectral result")
+    result = canonical_numbers(result)
     OUTPUT.mkdir(parents=True, exist_ok=True)
     json_path = OUTPUT / "telemetry-decimation-audit.json"
     csv_path = OUTPUT / "telemetry-decimation-audit.csv"
