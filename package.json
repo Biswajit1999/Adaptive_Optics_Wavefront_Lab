@@ -1,0 +1,15 @@
+{
+  "name": "adaptive-optics-wavefront-lab",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Observation-first CIAO AOT telemetry audit and bounded adaptive-optics teaching model.",
+  "type": "commonjs",
+  "scripts": {
+    "test": "node tests/test_science_core.cjs && node tools/validate_html_contract.js && node tools/validate_worker_contract.js && node tools/validate_fourier_psf.js",
+    "syntax": "node --check assets/js/app.js && node --check assets/js/science-core.js && node --check assets/js/physicsWorker.js",
+    "check": "npm run syntax && npm test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

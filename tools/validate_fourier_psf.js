@@ -1,115 +1,93 @@
-// Run with: node tools/validate_fourier_psf.js
-// Independent checks for the browser FFT convention and binary pupil geometry.
+#!/usr/bin/env node
+"use strict";
 
-function fft1d(real, imag) {
-  const n = real.length;
-  for (let i = 1, j = 0; i < n; i += 1) {
-    let bit = n >> 1;
-    while (j & bit) { j ^= bit; bit >>= 1; }
-    j ^= bit;
-    if (i < j) {
-      [real[i], real[j]] = [real[j], real[i]];
-      [imag[i], imag[j]] = [imag[j], imag[i]];
+// Independent zero-aberration and small-phase checks for the worker FFT convention.
+const { zernikeNoll, marechalStrehl } = require("../assets/js/science-core.js");
+
+function fft(real, imaginary) {
+  const length = real.length;
+  let reversed = 0;
+  for (let index = 1; index < length; index += 1) {
+    let bit = length >> 1;
+    while (reversed & bit) { reversed ^= bit; bit >>= 1; }
+    reversed ^= bit;
+    if (index < reversed) {
+      [real[index], real[reversed]] = [real[reversed], real[index]];
+      [imaginary[index], imaginary[reversed]] = [imaginary[reversed], imaginary[index]];
     }
   }
-  for (let length = 2; length <= n; length <<= 1) {
-    const angle = -2 * Math.PI / length;
-    const c = Math.cos(angle);
-    const s = Math.sin(angle);
-    for (let start = 0; start < n; start += length) {
-      let wr = 1;
-      let wi = 0;
-      const half = length >> 1;
-      for (let k = 0; k < half; k += 1) {
-        const even = start + k;
-        const odd = even + half;
-        const vr = real[odd] * wr - imag[odd] * wi;
-        const vi = real[odd] * wi + imag[odd] * wr;
-        const er = real[even];
-        const ei = imag[even];
-        real[even] = er + vr;
-        imag[even] = ei + vi;
-        real[odd] = er - vr;
-        imag[odd] = ei - vi;
-        const next = wr * c - wi * s;
-        wi = wr * s + wi * c;
-        wr = next;
+  for (let block = 2; block <= length; block <<= 1) {
+    const angle = -2 * Math.PI / block;
+    const rotationReal = Math.cos(angle);
+    const rotationImaginary = Math.sin(angle);
+    for (let start = 0; start < length; start += block) {
+      let unitReal = 1;
+      let unitImaginary = 0;
+      for (let index = 0; index < block / 2; index += 1) {
+        const even = start + index;
+        const odd = even + block / 2;
+        const transformedReal = unitReal * real[odd] - unitImaginary * imaginary[odd];
+        const transformedImaginary = unitReal * imaginary[odd] + unitImaginary * real[odd];
+        real[odd] = real[even] - transformedReal;
+        imaginary[odd] = imaginary[even] - transformedImaginary;
+        real[even] += transformedReal;
+        imaginary[even] += transformedImaginary;
+        const nextReal = unitReal * rotationReal - unitImaginary * rotationImaginary;
+        unitImaginary = unitReal * rotationImaginary + unitImaginary * rotationReal;
+        unitReal = nextReal;
       }
     }
   }
 }
 
-function fft2d(real, imag, n) {
-  const rowR = new Float64Array(n);
-  const rowI = new Float64Array(n);
-  for (let y = 0; y < n; y += 1) {
-    for (let x = 0; x < n; x += 1) {
-      rowR[x] = real[y * n + x];
-      rowI[x] = imag[y * n + x];
+function fft2d(real, imaginary, size) {
+  const lineReal = new Float64Array(size);
+  const lineImaginary = new Float64Array(size);
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      lineReal[x] = real[y * size + x]; lineImaginary[x] = imaginary[y * size + x];
     }
-    fft1d(rowR, rowI);
-    for (let x = 0; x < n; x += 1) {
-      real[y * n + x] = rowR[x];
-      imag[y * n + x] = rowI[x];
+    fft(lineReal, lineImaginary);
+    for (let x = 0; x < size; x += 1) {
+      real[y * size + x] = lineReal[x]; imaginary[y * size + x] = lineImaginary[x];
     }
   }
-  for (let x = 0; x < n; x += 1) {
-    for (let y = 0; y < n; y += 1) {
-      rowR[y] = real[y * n + x];
-      rowI[y] = imag[y * n + x];
+  for (let x = 0; x < size; x += 1) {
+    for (let y = 0; y < size; y += 1) {
+      lineReal[y] = real[y * size + x]; lineImaginary[y] = imaginary[y * size + x];
     }
-    fft1d(rowR, rowI);
-    for (let y = 0; y < n; y += 1) {
-      real[y * n + x] = rowR[y];
-      imag[y * n + x] = rowI[y];
+    fft(lineReal, lineImaginary);
+    for (let y = 0; y < size; y += 1) {
+      real[y * size + x] = lineReal[y]; imaginary[y * size + x] = lineImaginary[y];
     }
   }
 }
 
-function pupilOpen(x, y, obscuration, spiderWidth) {
-  const radius = Math.hypot(x, y);
-  if (radius > 1 || radius < obscuration) return false;
-  return spiderWidth <= 0 || (Math.abs(x) >= spiderWidth && Math.abs(y) >= spiderWidth);
-}
-
-function directPeakRatio({ obscuration, spiderWidth, phase }) {
-  const n = 128;
-  const real = new Float64Array(n * n);
-  const imag = new Float64Array(n * n);
-  let samples = 0;
-  for (let y = 0; y < n; y += 1) {
-    for (let x = 0; x < n; x += 1) {
-      const px = (2 * (x + 0.5)) / n - 1;
-      const py = (2 * (y + 0.5)) / n - 1;
-      if (!pupilOpen(px, py, obscuration, spiderWidth)) continue;
-      const value = phase(px, py);
-      const index = y * n + x;
-      real[index] = Math.cos(2 * Math.PI * value);
-      imag[index] = Math.sin(2 * Math.PI * value);
-      samples += 1;
+function directPeak(coefficientWaves, size = 128) {
+  const real = new Float64Array(size * size);
+  const imaginary = new Float64Array(size * size);
+  let apertureCount = 0;
+  for (let y = 0; y < size; y += 1) {
+    const cy = 2 * (y + 0.5) / size - 1;
+    for (let x = 0; x < size; x += 1) {
+      const cx = 2 * (x + 0.5) / size - 1;
+      const rho = Math.hypot(cx, cy);
+      if (rho > 1) continue;
+      const phase = 2 * Math.PI * coefficientWaves * zernikeNoll(4, rho, Math.atan2(cy, cx));
+      const index = y * size + x;
+      real[index] = Math.cos(phase); imaginary[index] = Math.sin(phase); apertureCount += 1;
     }
   }
-  fft2d(real, imag, n);
-  return { samples, ratio: (real[0] * real[0] + imag[0] * imag[0]) / (samples * samples) };
+  fft2d(real, imaginary, size);
+  return (real[0] * real[0] + imaginary[0] * imaginary[0]) / (apertureCount * apertureCount);
 }
 
-function expectClose(name, actual, expected, tolerance = 1e-12) {
-  if (Math.abs(actual - expected) > tolerance) throw new Error(`${name}: expected ${expected}, received ${actual}`);
+const flat = directPeak(0);
+const small = directPeak(0.03);
+const larger = directPeak(0.15);
+if (Math.abs(flat - 1) > 1e-12) throw new Error(`flat-pupil peak ${flat}`);
+if (!(flat > small && small > larger)) throw new Error("direct peak must decrease with defocus");
+if (Math.abs(small - marechalStrehl(0.03)) > 0.005) {
+  throw new Error("small-phase direct peak and Marechal approximation diverge unexpectedly");
 }
-
-const clear = directPeakRatio({ obscuration: 0, spiderWidth: 0, phase: () => 0 });
-const obstructed = directPeakRatio({ obscuration: 0.28, spiderWidth: 0.015, phase: () => 0 });
-const defocused = directPeakRatio({
-  obscuration: 0.28,
-  spiderWidth: 0.015,
-  phase: (x, y) => 0.25 * Math.sqrt(3) * (2 * (x * x + y * y) - 1),
-});
-
-expectClose("flat clear pupil", clear.ratio, 1);
-expectClose("flat obstructed pupil", obstructed.ratio, 1);
-if (!(obstructed.samples < clear.samples && obstructed.samples > 0)) throw new Error("pupil geometry did not reduce transmitted samples");
-if (!(defocused.ratio < obstructed.ratio)) throw new Error("defocus did not reduce the direct PSF peak");
-
-console.log(`PASS clear flat-pupil direct peak = ${clear.ratio.toFixed(12)}`);
-console.log(`PASS obstructed flat-pupil direct peak = ${obstructed.ratio.toFixed(12)}`);
-console.log(`PASS phase perturbation reduces peak: ${defocused.ratio.toFixed(6)} < ${obstructed.ratio.toFixed(6)}`);
+console.log(`PASS worker FFT convention: flat=${flat.toFixed(12)}, 0.03-wave=${small.toFixed(6)}, 0.15-wave=${larger.toFixed(6)}`);

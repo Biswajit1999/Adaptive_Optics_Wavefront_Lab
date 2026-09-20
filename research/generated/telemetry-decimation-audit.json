@@ -1,0 +1,156 @@
+{
+  "browser_product": {
+    "effective_sample_rate_hz": 9.99924,
+    "file": "ciao1_aot_telemetry.json",
+    "frames": 300,
+    "maximum_fits_parity_error": {
+      "gradientX": 5.000000000143778e-07,
+      "gradientY": 4.999389648444041e-07,
+      "hodmPosition": 5.000000000005e-07,
+      "seconds": 1.2101745738846148e-07,
+      "sourceFrameIndex": 0.0,
+      "subapertureIntensity": 0.0
+    },
+    "nyquist_hz": 4.99962,
+    "sha256": "3b178065db3cb38db498ab965beb58b5c93eb6ff960cd7f9670b500787a5f615",
+    "stride": 50
+  },
+  "conclusions": {
+    "distribution_gate_passed": true,
+    "interpretation": "The browser product is an exact rounded stride sample. Distributional and temporal fitness are separate gates; a failed temporal gate forbids spectral, bandwidth, or closed-loop dynamics inference from the 300-frame browser product.",
+    "provenance_gate_passed": true,
+    "temporal_gate_passed": false
+  },
+  "metrics": [
+    {
+      "distribution_gate_passed": true,
+      "full": {
+        "mean": 0.15875238998000665,
+        "n": 15000,
+        "std": 0.01321300044774217
+      },
+      "largest_quantile_error_in_full_iqr": 0.10918876072005254,
+      "mean_error_in_full_sd": 0.005358739243956424,
+      "metric": "gradient_rms",
+      "power_above_reduced_nyquist_fraction": 0.20894949414700079,
+      "quantiles": {
+        "q05": {
+          "absolute_error": 0.001930727439528157,
+          "error_in_full_iqr": 0.10918876072005254,
+          "full": 0.13795122257109246,
+          "retained": 0.13988195001062062
+        },
+        "q50": {
+          "absolute_error": 0.0003424536268546996,
+          "error_in_full_iqr": 0.01936683881671566,
+          "full": 0.15803962199058347,
+          "retained": 0.15838207561743817
+        },
+        "q95": {
+          "absolute_error": 0.0011345246634657524,
+          "error_in_full_iqr": 0.06416096828272874,
+          "full": 0.18207131997717105,
+          "retained": 0.1832058446406368
+        }
+      },
+      "retained": {
+        "mean": 0.15882319500403638,
+        "n": 300,
+        "std": 0.01364034298815364
+      },
+      "temporal_gate_passed": false
+    },
+    {
+      "distribution_gate_passed": true,
+      "full": {
+        "mean": 0.16446995166988204,
+        "n": 15000,
+        "std": 0.02069849607305953
+      },
+      "largest_quantile_error_in_full_iqr": 0.011539005983464001,
+      "mean_error_in_full_sd": 0.027243940512927715,
+      "metric": "command_rms",
+      "power_above_reduced_nyquist_fraction": 0.09188056827950156,
+      "quantiles": {
+        "q05": {
+          "absolute_error": 0.0002538922538440902,
+          "error_in_full_iqr": 0.009058506433055448,
+          "full": 0.13209972007810422,
+          "retained": 0.13184582782426013
+        },
+        "q50": {
+          "absolute_error": 0.0003234158145068444,
+          "error_in_full_iqr": 0.011539005983464001,
+          "full": 0.16340804801356473,
+          "retained": 0.16373146382807158
+        },
+        "q95": {
+          "absolute_error": 0.00027050938004438696,
+          "error_in_full_iqr": 0.00965138133295971,
+          "full": 0.20063777362942561,
+          "retained": 0.20036726424938123
+        }
+      },
+      "retained": {
+        "mean": 0.16390604307416054,
+        "n": 300,
+        "std": 0.020492796599873273
+      },
+      "temporal_gate_passed": false
+    },
+    {
+      "distribution_gate_passed": true,
+      "full": {
+        "mean": 5266.295250980392,
+        "n": 15000,
+        "std": 27.39356887819075
+      },
+      "largest_quantile_error_in_full_iqr": 0.09976284584977203,
+      "mean_error_in_full_sd": 0.04114655470431142,
+      "metric": "mean_flux",
+      "power_above_reduced_nyquist_fraction": 0.6445709862713875,
+      "quantiles": {
+        "q05": {
+          "absolute_error": 3.711764705881251,
+          "error_in_full_iqr": 0.09976284584977203,
+          "full": 5220.529411764706,
+          "retained": 5224.241176470588
+        },
+        "q50": {
+          "absolute_error": 0.022058823529732763,
+          "error_in_full_iqr": 0.0005928853755026945,
+          "full": 5266.661764705882,
+          "retained": 5266.683823529412
+        },
+        "q95": {
+          "absolute_error": 3.625,
+          "error_in_full_iqr": 0.09743083003952499,
+          "full": 5310.883088235294,
+          "retained": 5314.508088235294
+        }
+      },
+      "retained": {
+        "mean": 5267.422401960785,
+        "n": 300,
+        "std": 26.63507654194808
+      },
+      "temporal_gate_passed": false
+    }
+  ],
+  "predeclared_gates": {
+    "distribution_mean_error_full_sd_max": 0.1,
+    "distribution_quantile_error_full_iqr_max": 0.2,
+    "provenance_max_absolute_error": 5.01e-07,
+    "temporal_power_above_reduced_nyquist_max": 0.05
+  },
+  "schema_version": "1.0.0",
+  "source": {
+    "doi": "10.5281/zenodo.8192742",
+    "file": "CIAO1_2019-12-06_DATA_EXPO-015808.fits",
+    "frames": 15000,
+    "loop_rate_hz": 499.962,
+    "md5": "069b37b24997bf55c5312a7bad469502",
+    "sha256": "cd9e05a65c90e459df28fb8c2d4671381a08060d10b012c472dc41a6bdfd3d0e"
+  },
+  "study": "CIAO1 stride-50 telemetry fidelity audit"
+}

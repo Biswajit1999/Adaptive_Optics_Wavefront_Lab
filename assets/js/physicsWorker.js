@@ -1,23 +1,29 @@
 "use strict";
 
+importScripts("science-core.js");
+
+const {
+  MODES,
+  NOLL,
+  clamp,
+  finiteNumber,
+  zernikeNoll,
+  coefficientRms,
+  pairedRms,
+  rms,
+  mean,
+  quantile,
+  marechalStrehl,
+  pidIncrement,
+  createRandom,
+  gaussian,
+  validateTelemetryPayload,
+} = self.AOScienceCore;
+
 const OBSERVATION_URL = "../../data/observations/ciao1_aot_telemetry.json";
 const GRID_SIZE = 128;
 const DISPLAY_RANGE_WAVES = 0.75;
 const FRAME_INTERVAL_MS = 50;
-const MODES = [4, 5, 6, 7, 8, 11];
-const NOLL = Object.freeze({
-  1: { n: 0, m: 0, name: "Piston" },
-  2: { n: 1, m: 1, name: "Tilt X" },
-  3: { n: 1, m: -1, name: "Tilt Y" },
-  4: { n: 2, m: 0, name: "Defocus" },
-  5: { n: 2, m: -2, name: "Astigmatism -2" },
-  6: { n: 2, m: 2, name: "Astigmatism +2" },
-  7: { n: 3, m: -1, name: "Coma -1" },
-  8: { n: 3, m: 1, name: "Coma +1" },
-  9: { n: 3, m: -3, name: "Trefoil -3" },
-  10: { n: 3, m: 3, name: "Trefoil +3" },
-  11: { n: 4, m: 0, name: "Primary spherical" },
-});
 
 const basis = buildBasis();
 const runtime = {
@@ -91,7 +97,6 @@ async function configure(message) {
     });
   }
 }
-
 function loadObservation() {
   if (!runtime.observationPromise) {
     runtime.observationPromise = fetch(OBSERVATION_URL)
@@ -107,10 +112,8 @@ function loadObservation() {
 }
 
 function buildObservationProduct(payload) {
+  validateTelemetryPayload(payload);
   const telemetry = payload.telemetry;
-  if (!telemetry || !Array.isArray(telemetry.gradientX) || !telemetry.gradientX.length) {
-    throw new Error("AOT telemetry browser asset is malformed");
-  }
   const frames = telemetry.seconds.length;
   const gradientRms = new Float32Array(frames);
   const commandRms = new Float32Array(frames);
@@ -236,23 +239,23 @@ function emitObservationCursor() {
 function sanitise(raw) {
   return {
     modelOverlay: Boolean(raw.modelOverlay),
-    playbackRate: clamp(number(raw.playbackRate, 1), 0.05, 20),
+    playbackRate: clamp(finiteNumber(raw.playbackRate, 1), 0.05, 20),
     coefficients: new Float64Array([
-      number(raw.z4, 0.22),
-      number(raw.z5, 0.12),
-      number(raw.z6, -0.18),
-      number(raw.z7, 0.16),
-      number(raw.z8, 0.06),
-      number(raw.z11, 0.08),
+      finiteNumber(raw.z4, 0.22),
+      finiteNumber(raw.z5, 0.12),
+      finiteNumber(raw.z6, -0.18),
+      finiteNumber(raw.z7, 0.16),
+      finiteNumber(raw.z8, 0.06),
+      finiteNumber(raw.z11, 0.08),
     ]),
-    turbulenceWaves: clamp(number(raw.turbulence, 0.08), 0, 2),
-    sensorNoiseWaves: clamp(number(raw.sensorNoise, 0.002), 0, 1),
-    wavelengthNm: clamp(number(raw.wavelength, 1650), 100, 10000),
-    kp: clamp(number(raw.kp, 0.32), 0, 2),
-    ki: clamp(number(raw.ki, 0.06), 0, 4),
-    kd: clamp(number(raw.kd, 0.002), 0, 0.2),
-    loopRateHz: clamp(number(raw.loopRate, 200), 1, 5000),
-    latencyFrames: Math.round(clamp(number(raw.latency, 2), 0, 100)),
+    turbulenceWaves: clamp(finiteNumber(raw.turbulence, 0.08), 0, 2),
+    sensorNoiseWaves: clamp(finiteNumber(raw.sensorNoise, 0.002), 0, 1),
+    wavelengthNm: clamp(finiteNumber(raw.wavelength, 1650), 100, 10000),
+    kp: clamp(finiteNumber(raw.kp, 0.32), 0, 2),
+    ki: clamp(finiteNumber(raw.ki, 0.06), 0, 4),
+    kd: clamp(finiteNumber(raw.kd, 0.002), 0, 0.2),
+    loopRateHz: clamp(finiteNumber(raw.loopRate, 200), 1, 5000),
+    latencyFrames: Math.round(clamp(finiteNumber(raw.latency, 2), 0, 100)),
   };
 }
 
@@ -306,7 +309,7 @@ function emitModelFrame() {
   const psf = computePsf(products.residualValues, products.mask);
   const inputRms = coefficientRms(coefficients.incoming);
   const residualRms = coefficientRms(coefficients.residual);
-  const strehl = Math.exp(-Math.pow(2 * Math.PI * residualRms, 2));
+  const strehl = marechalStrehl(residualRms);
   runtime.history.push({ time: runtime.timeSeconds, rms: residualRms });
   if (runtime.history.length > 220) {
     runtime.history.shift();
@@ -359,13 +362,17 @@ function advanceController() {
     const queue = runtime.delayQueues[index];
     queue.push(immediateError + parameters.sensorNoiseWaves * gaussian(runtime.random));
     const measurement = queue.length > parameters.latencyFrames ? queue.shift() : 0;
-    runtime.integral[index] = clamp(runtime.integral[index] + measurement * dt, -2, 2);
-    const derivative = (measurement - runtime.previousError[index]) / dt;
-    const update =
-      parameters.kp * measurement +
-      parameters.ki * runtime.integral[index] +
-      parameters.kd * derivative;
-    runtime.correction[index] += clamp(update, -0.25, 0.25);
+    const pid = pidIncrement({
+      measurement,
+      previousError: runtime.previousError[index],
+      integral: runtime.integral[index],
+      dt,
+      kp: parameters.kp,
+      ki: parameters.ki,
+      kd: parameters.kd,
+    });
+    runtime.integral[index] = pid.integral;
+    runtime.correction[index] += clamp(pid.increment, -0.25, 0.25);
     runtime.correction[index] = clamp(runtime.correction[index], -3, 3);
     runtime.previousError[index] = measurement;
   }
@@ -552,101 +559,4 @@ function buildBasis() {
     }
   }
   return { mask, values };
-}
-
-function zernikeNoll(index, rho, theta) {
-  const mode = NOLL[index];
-  const absoluteM = Math.abs(mode.m);
-  let radial = 0;
-  for (let s = 0; s <= (mode.n - absoluteM) / 2; s += 1) {
-    const sign = s % 2 === 0 ? 1 : -1;
-    radial += sign * factorial(mode.n - s) /
-      (factorial(s) * factorial((mode.n + absoluteM) / 2 - s) *
-        factorial((mode.n - absoluteM) / 2 - s)) *
-      rho ** (mode.n - 2 * s);
-  }
-  const normalisation = mode.m === 0 ? Math.sqrt(mode.n + 1) : Math.sqrt(2 * (mode.n + 1));
-  const angular =
-    mode.m === 0 ? 1 : mode.m > 0 ? Math.cos(absoluteM * theta) : Math.sin(absoluteM * theta);
-  return normalisation * radial * angular;
-}
-
-function coefficientRms(coefficients) {
-  let total = 0;
-  for (const coefficient of coefficients) {
-    total += coefficient * coefficient;
-  }
-  return Math.sqrt(total);
-}
-
-function pairedRms(first, second) {
-  let total = 0;
-  for (let index = 0; index < first.length; index += 1) {
-    total += first[index] * first[index] + second[index] * second[index];
-  }
-  return Math.sqrt(total / (first.length * 2));
-}
-
-function rms(values) {
-  let total = 0;
-  for (const value of values) {
-    total += value * value;
-  }
-  return Math.sqrt(total / Math.max(1, values.length));
-}
-
-function mean(values) {
-  let total = 0;
-  for (const value of values) {
-    total += value;
-  }
-  return total / Math.max(1, values.length);
-}
-
-function quantile(sortedValues, fraction) {
-  const index = Math.floor(clamp(fraction, 0, 1) * (sortedValues.length - 1));
-  return sortedValues[index];
-}
-
-function factorial(value) {
-  let result = 1;
-  for (let index = 2; index <= value; index += 1) {
-    result *= index;
-  }
-  return result;
-}
-
-function createRandom(seed) {
-  let value = seed >>> 0;
-  const random = () => {
-    value = (value + 0x6d2b79f5) >>> 0;
-    let mixed = value;
-    mixed = Math.imul(mixed ^ (mixed >>> 15), mixed | 1);
-    mixed ^= mixed + Math.imul(mixed ^ (mixed >>> 7), mixed | 61);
-    return ((mixed ^ (mixed >>> 14)) >>> 0) / 4294967296;
-  };
-  random.spare = null;
-  return random;
-}
-
-function gaussian(random) {
-  if (random.spare !== null) {
-    const spare = random.spare;
-    random.spare = null;
-    return spare;
-  }
-  const first = Math.max(Number.EPSILON, random());
-  const second = random();
-  const magnitude = Math.sqrt(-2 * Math.log(first));
-  random.spare = magnitude * Math.sin(2 * Math.PI * second);
-  return magnitude * Math.cos(2 * Math.PI * second);
-}
-
-function clamp(value, minimum, maximum) {
-  return Math.max(minimum, Math.min(maximum, value));
-}
-
-function number(value, fallback) {
-  const converted = Number(value);
-  return Number.isFinite(converted) ? converted : fallback;
 }

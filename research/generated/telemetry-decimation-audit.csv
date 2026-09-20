@@ -1,0 +1,4 @@
+metric,full_n,retained_n,full_mean,retained_mean,mean_error_in_full_sd,largest_quantile_error_in_full_iqr,power_above_reduced_nyquist_fraction,distribution_gate_passed,temporal_gate_passed
+gradient_rms,15000,300,0.15875238998,0.158823195004,0.00535873924396,0.10918876072,0.208949494147,true,false
+command_rms,15000,300,0.16446995167,0.163906043074,0.0272439405129,0.0115390059835,0.0918805682795,true,false
+mean_flux,15000,300,5266.29525098,5267.42240196,0.0411465547043,0.0997628458498,0.644570986271,true,false
