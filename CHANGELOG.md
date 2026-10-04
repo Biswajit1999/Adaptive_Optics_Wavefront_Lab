@@ -11,5 +11,4 @@
   import it, eliminating test-only numerical implementations.
 - Added fail-closed telemetry schema checks and direct PID/Maréchal/FFT contracts.
 - Replaced stale branch-specific checks with one pinned clean-checkout workflow.
-- Added public evidence and research-maturity panels with explicit non-claims.
-
+- Added public scientific evidence panels with explicit non-claims.

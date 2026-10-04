@@ -24,7 +24,6 @@ or CIAO controller reconstruction. See [METHODS.md](METHODS.md),
 [CLAIMS.md](CLAIMS.md), and the
 [machine-readable audit](research/generated/telemetry-decimation-audit.json).
 
-![Before/after research maturity audit](assets/research-maturity-before-after.svg)
 
 ## Released Telemetry Product
 

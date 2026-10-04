@@ -33,6 +33,5 @@ expectIncludes('effective sample rate', '9.999 Hz effective sample rate');
 expectIncludes('temporal inference boundary', 'not a temporal-spectrum or closed-loop bandwidth product');
 expectIncludes('failed temporal gate', '<strong>Temporal gate: FAIL.</strong>');
 expectIncludes('machine-readable evidence', 'research/generated/telemetry-decimation-audit.json');
-expectIncludes('maturity graph', 'assets/research-maturity-before-after.svg');
 
 console.log('PASS observation-first HTML, evidence, and inference-boundary contract');

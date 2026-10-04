@@ -12,5 +12,3 @@
 | N2 | not claimed | The sparse browser product measures loop bandwidth, temporal PSD, or transfer functions. | Temporal gate fails; only the full-rate FITS is suitable for a future temporal analysis. |
 | N3 | not claimed | Simulation-mode gains reproduce the CIAO controller. | The PID experiment is deterministic and pedagogical; it is not inferred from the observation. |
 | N4 | not claimed | Header `STREHL-R=0.71` is a per-frame Strehl time series. | It is displayed as one released summary-header value, not recomputed for each retained frame. |
-| N5 | not claimed | Repository maturity score measures scientific truth, applicant quality, peer review, or citation impact. | It scores auditable repository practices only. |
-
