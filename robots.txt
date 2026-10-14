@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://biswajit1999.github.io/Adaptive_Optics_Wavefront_Lab/sitemap.xml
