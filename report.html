@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Project report: motivation, pipeline, validated results and limits of Biswajit Jana's adaptive optics learning project.">
+<title>Project report — Adaptive Optics Wavefront Lab</title>
+<link rel="icon" href="assets/favicon.svg">
+<link rel="stylesheet" href="assets/css/research.css?v=20261022.1">
+<link rel="canonical" href="https://biswajit1999.github.io/Adaptive_Optics_Wavefront_Lab/report.html">
+</head><body>
+<a class="skip" href="#report">Skip to report</a>
+<header class="site-header"><a class="wordmark" href="index.html"><span class="mark">AO</span> Wavefront Lab</a><nav aria-label="Project"><a href="index.html">Overview</a><a href="report.html">Report</a><a href="summary.html">Project at a glance</a><a href="lab.html">Open lab ↗</a></nav></header>
+<main class="report-shell"><nav class="report-toc" aria-label="Document contents"><strong>In this document</strong><div class="toc">
+<ul>
+<li><a href="#adaptive-optics-wavefront-lab">Adaptive Optics Wavefront Lab</a><ul>
+<li><a href="#a-learning-project-in-telemetry-feedback-and-scientific-inference">A learning project in telemetry, feedback and scientific inference</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#1-motivation-and-question">1. Motivation and question</a></li>
+<li><a href="#2-contribution-and-ownership">2. Contribution and ownership</a></li>
+<li><a href="#3-source-and-provenance">3. Source and provenance</a></li>
+<li><a href="#4-pipeline-and-definitions">4. Pipeline and definitions</a></li>
+<li><a href="#5-evaluation-protocol">5. Evaluation protocol</a><ul>
+<li><a href="#provenance-gate">Provenance gate</a></li>
+<li><a href="#distribution-gate">Distribution gate</a></li>
+<li><a href="#temporal-gate">Temporal gate</a></li>
+</ul>
+</li>
+<li><a href="#6-results-and-interpretation">6. Results and interpretation</a></li>
+<li><a href="#7-the-separate-teaching-model">7. The separate teaching model</a></li>
+<li><a href="#8-what-this-work-demonstratesand-what-i-still-need-to-learn">8. What this work demonstrates—and what I still need to learn</a></li>
+<li><a href="#9-reproduction-and-demonstration">9. Reproduction and demonstration</a></li>
+<li><a href="#10-proposed-next-study">10. Proposed next study</a></li>
+<li><a href="#references-and-attribution">References and attribution</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav>
+<article class="report-body" id="report"><details class="mobile-toc"><summary>Document contents</summary><div class="toc">
+<ul>
+<li><a href="#adaptive-optics-wavefront-lab">Adaptive Optics Wavefront Lab</a><ul>
+<li><a href="#a-learning-project-in-telemetry-feedback-and-scientific-inference">A learning project in telemetry, feedback and scientific inference</a></li>
+<li><a href="#abstract">Abstract</a></li>
+<li><a href="#1-motivation-and-question">1. Motivation and question</a></li>
+<li><a href="#2-contribution-and-ownership">2. Contribution and ownership</a></li>
+<li><a href="#3-source-and-provenance">3. Source and provenance</a></li>
+<li><a href="#4-pipeline-and-definitions">4. Pipeline and definitions</a></li>
+<li><a href="#5-evaluation-protocol">5. Evaluation protocol</a><ul>
+<li><a href="#provenance-gate">Provenance gate</a></li>
+<li><a href="#distribution-gate">Distribution gate</a></li>
+<li><a href="#temporal-gate">Temporal gate</a></li>
+</ul>
+</li>
+<li><a href="#6-results-and-interpretation">6. Results and interpretation</a></li>
+<li><a href="#7-the-separate-teaching-model">7. The separate teaching model</a></li>
+<li><a href="#8-what-this-work-demonstratesand-what-i-still-need-to-learn">8. What this work demonstrates—and what I still need to learn</a></li>
+<li><a href="#9-reproduction-and-demonstration">9. Reproduction and demonstration</a></li>
+<li><a href="#10-proposed-next-study">10. Proposed next study</a></li>
+<li><a href="#references-and-attribution">References and attribution</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</details><div class="report-tools"><button type="button" onclick="window.print()">Print / save as PDF</button><a href="PROJECT_REPORT.md">Markdown source</a><a href="https://github.com/Biswajit1999/Adaptive_Optics_Wavefront_Lab">Repository</a></div>
+<h1 id="adaptive-optics-wavefront-lab">Adaptive Optics Wavefront Lab</h1>
+<h2 id="a-learning-project-in-telemetry-feedback-and-scientific-inference">A learning project in telemetry, feedback and scientific inference</h2>
+<p><strong>Biswajit Jana · Independent learning project · 22 October 2026</strong></p>
+<h2 id="abstract">Abstract</h2>
+<p>This project connects my interest in instrumentation and feedback control with astronomical imaging. I use a public adaptive-optics telemetry release to learn how wavefront-sensor measurements and mirror commands are represented, processed and communicated. The main evaluated question is narrow: <strong>what information survives the stride-50 reduction used by this browser display?</strong></p>
+<p>The pipeline retains a CIAO1 AOT FITS observation, produces a lightweight browser representation, and tests provenance, three distributional summaries and a temporal-fidelity criterion separately. All 79,200 retained telemetry values reproduce the selected source values within the declared rounding bound. The three scalar diagnostics pass the repository's distribution thresholds, but all fail its temporal criterion. The result is a useful sparse overview, not a product for recovering closed-loop bandwidth or temporal spectra. A separate six-mode optical/control model supports learning; it is not fitted to CIAO.</p>
+<h2 id="1-motivation-and-question">1. Motivation and question</h2>
+<p>I started this project to connect instrumentation and feedback-control concepts to their role in astronomical imaging, and to learn wavefront sensing and adaptive optics through real telemetry rather than equations alone. My aim is to understand what a measurement means, how a computational representation changes it, and when a visually convincing output does not justify a physical conclusion.</p>
+<p>AO systems use wavefront measurements and corrective optics in a feedback loop. The released measurements provide an entry point into that chain, but they are not automatically an image of the incoming wavefront. A calibrated reconstruction would require additional instrument knowledge.</p>
+<p>My working question became: <strong>does a 300-frame browser product preserve enough of a 15,000-frame observation for provenance checks, coarse distribution summaries and temporal interpretation?</strong> Keeping those as separate questions is central to this project.</p>
+<h2 id="2-contribution-and-ownership">2. Contribution and ownership</h2>
+<p>The contribution represented by this repository is a reproducible data-inspection and validation workflow, an observation-first browser interface, and a deliberately separate teaching model. The audit and documentation make the limits of a reduced data product visible rather than treating a dashboard as scientific validation.</p>
+<p>The observation was acquired and released by the source teams; I did not acquire the telescope data, build CIAO, calibrate its controller, or demonstrate an on-sky improvement. Source attribution belongs to Gomes and collaborators and the relevant ESO instrumentation teams. The repository is authored and maintained by Biswajit Jana. AI-assisted development and review were used in this upgrade; this report is not evidence that every line was written unaided. Understanding the equations, reproducing the tests and explaining the boundaries remain my responsibility.</p>
+<h2 id="3-source-and-provenance">3. Source and provenance</h2>
+<p>The input is <code>CIAO1_2019-12-06_DATA_EXPO-015808.fits</code>, from the <a href="https://doi.org/10.5281/zenodo.8192742">AOT proof-of-concept release</a>. The release description associates CIAO with ESO programme <strong>60.A-9278(C)</strong>. This attribution comes from the release description, not a programme keyword asserted to exist in this FITS header.</p>
+<p>The filename contains 6 December, while the retained observation metadata starts at 01:58:09 UTC on 7 December 2019. File naming and observation timestamp are therefore reported separately.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source frames</td>
+<td>15,000</td>
+</tr>
+<tr>
+<td>Released loop-rate metadata</td>
+<td>499.962 Hz</td>
+</tr>
+<tr>
+<td>Browser selection</td>
+<td>Frames 0, 50, …, 14,950</td>
+</tr>
+<tr>
+<td>Retained frames</td>
+<td>300</td>
+</tr>
+<tr>
+<td>Effective reduced rate</td>
+<td>9.99924 Hz</td>
+</tr>
+<tr>
+<td>Reduced Nyquist frequency</td>
+<td>4.99962 Hz</td>
+</tr>
+<tr>
+<td>Gradient X / Y</td>
+<td>68 channels each</td>
+</tr>
+<tr>
+<td>Subaperture intensity</td>
+<td>68 channels</td>
+</tr>
+<tr>
+<td>HODM commands</td>
+<td>60 channels</td>
+</tr>
+<tr>
+<td>Retained telemetry values</td>
+<td>300 × (68 + 68 + 68 + 60) = 79,200</td>
+</tr>
+<tr>
+<td>Additional coordinates</td>
+<td>300 timestamps and 300 frame indices</td>
+</tr>
+</tbody>
+</table>
+<p>The FITS MD5 is <code>069b37b24997bf55c5312a7bad469502</code>. SHA-256 receipts for both source and browser product are committed in the <a href="research/generated/telemetry-decimation-audit.json">machine-readable audit</a>. Verification reads the committed source; it does not silently replace the observation with a newer download.</p>
+<h2 id="4-pipeline-and-definitions">4. Pipeline and definitions</h2>
+<p><strong>Released FITS → explicit stride selection → rounded JSON → independent audit → browser inspection.</strong></p>
+<ol>
+<li>Read timestamps, gradient arrays, subaperture intensities and HODM positions from the AOT FITS extensions.</li>
+<li>Select every 50th frame, retaining the source-frame index. Round JSON floating-point values to six decimal places for the browser product.</li>
+<li>Independently reopen the source FITS and compare every selected value to the browser representation.</li>
+<li>Compute full-rate and retained-sample diagnostics for distribution comparison.</li>
+<li>Compute above-reduced-Nyquist power from the <strong>full-rate</strong> diagnostics, not from the already reduced series.</li>
+<li>Display the retained matrices and audit findings. Keep the optional model on a separate path.</li>
+</ol>
+<p>For frame k, the scalar diagnostics are:</p>
+<ul>
+<li>Gradient RMS: square root of the mean of squared X and Y gradients over both components and 68 channels.</li>
+<li>Command RMS: square root of the mean of squared HODM command values over 60 actuators.</li>
+<li>Mean flux: arithmetic mean of the 68 subaperture intensity values.</li>
+</ul>
+<p>Gradient and command values remain in their released native units. Neither RMS is labelled as calibrated wavefront error in nanometres. Header <code>STREHL-R = 0.71</code> is a fixed released summary, not a per-frame reconstructed Strehl measurement.</p>
+<h2 id="5-evaluation-protocol">5. Evaluation protocol</h2>
+<h3 id="provenance-gate">Provenance gate</h3>
+<p>Each retained floating-point value must differ from the corresponding source value by no more than <code>5.01e-7</code>. This accommodates six-decimal rounding. Integer source-frame indices must match exactly. Shapes are checked before values.</p>
+<h3 id="distribution-gate">Distribution gate</h3>
+<p>For each of the three diagnostics, the retained mean must be within 0.10 full-rate standard deviations of the full-rate mean. Each of the 5th, 50th and 95th percentiles must be within 0.20 full-rate interquartile ranges of its full-rate counterpart. Standard deviation uses sample normalisation; quantiles use linear interpolation.</p>
+<p>These are <strong>repository acceptance thresholds</strong>, not universal AO standards. “Predeclared” in the audit refers to thresholds in the code; it does not mean an externally registered research protocol. Passing these tests is not proof of equality of distributions or of fidelity for every channel.</p>
+<h3 id="temporal-gate">Temporal gate</h3>
+<p>Subtract the full-series mean, apply a Hann window, compute the real FFT, and square its magnitude. Divide the power above 4.99962 Hz by the total non-DC power. The acceptance limit is 5% for each diagnostic.</p>
+<p>This tests the risk in uniform point decimation without anti-alias filtering. It is not a calibrated temporal transfer-function estimate, a frequency-resolved noise budget or a measurement of the actual alias error in every retained channel.</p>
+<h2 id="6-results-and-interpretation">6. Results and interpretation</h2>
+<table>
+<thead>
+<tr>
+<th>Diagnostic</th>
+<th style="text-align: right;">Mean error / full SD</th>
+<th style="text-align: right;">Largest percentile error / full IQR</th>
+<th style="text-align: right;">Power above reduced Nyquist</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Gradient RMS</td>
+<td style="text-align: right;">0.0054</td>
+<td style="text-align: right;">0.1092</td>
+<td style="text-align: right;">20.89%</td>
+</tr>
+<tr>
+<td>Command RMS</td>
+<td style="text-align: right;">0.0272</td>
+<td style="text-align: right;">0.0115</td>
+<td style="text-align: right;">9.19%</td>
+</tr>
+<tr>
+<td>Mean flux</td>
+<td style="text-align: right;">0.0411</td>
+<td style="text-align: right;">0.0998</td>
+<td style="text-align: right;">64.46%</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Above-Nyquist power exceeds the repository's 5 percent limit for all three diagnostics." src="assets/telemetry-decimation-audit.svg" /></p>
+<p>The provenance gate passes for 79,200 telemetry values, 300 timestamps and 300 source-frame indices. All three diagnostics pass the distribution gate. All three fail the temporal gate.</p>
+<p>The defensible conclusion is that this exact rounded sample supports a sparse visual overview and the specified coarse summaries for this observation. It cannot support claims about loop bandwidth, disturbance rejection or temporal spectra from the browser product. <strong>A failed reduction gate is not a failure of CIAO.</strong> It is evidence about the representation chosen for this interface.</p>
+<p>The study covers one roughly 30-second observation and three aggregate diagnostics. It does not establish generalisation across observing conditions, instruments or targets, nor does it evaluate channel cross-correlations, individual-channel spectra or uncertainty across independent observations.</p>
+<h2 id="7-the-separate-teaching-model">7. The separate teaching model</h2>
+<p>The model uses six Noll-index Zernike modes: J4, J5, J6, J7, J8 and J11. The modes are unit-RMS on a continuous clear unit disk; a finite 128 × 128 pupil grid approximates that geometry. Mode coefficients are expressed in waves. Dynamic disturbances are deterministic sums of sinusoids, with seeded Gaussian measurement noise. This is not a Kolmogorov phase-screen simulation or a physical photon/read-noise model.</p>
+<p>A delayed modal error drives a custom accumulating correction. With dt = 1 / model loop rate:</p>
+<pre><code class="language-text">I[k] = clamp(I[k-1] + e[k] dt, -2, 2)
+delta[k] = Kp e[k] + Ki I[k] + Kd (e[k] - e[k-1]) / dt
+u[k+1] = clamp(u[k] + clamp(delta[k], -0.25, 0.25), -3, 3)
+residual = incoming - u
+</code></pre>
+<p>The proportional contribution itself accumulates in u. Consequently this is not a standard positional or velocity-form PID, and setting Ki to zero does not necessarily leave a static offset. Gains are teaching parameters, not measured CIAO gains.</p>
+<p>The model reports modal RMS, the Maréchal approximation <code>exp[-(2πσ)^2]</code>, and a separately computed FFT intensity peak normalised by the ideal clear-pupil peak. Maréchal is a small-phase approximation, not a reliable universal predictor at large aberration. The displayed PSF uses logarithmic intensity normalised to its own frame maximum; image brightness alone cannot compare absolute peaks across frames.</p>
+<p>The wavelength slider is explicitly a <strong>conversion wavelength</strong>: residual OPD in nm equals residual RMS in waves times wavelength in nm. It does not alter the fixed-wave phase model, predict chromatic behaviour or provide an angular plate scale.</p>
+<p>Absent components include a calibrated WFS reconstructor, interaction matrix, measured mirror influence functions, obscurations, non-common-path aberrations and a measured control transfer function. Simulated outcomes must not be presented as recovered on-sky performance.</p>
+<h2 id="8-what-this-work-demonstratesand-what-i-still-need-to-learn">8. What this work demonstrates—and what I still need to learn</h2>
+<p>The repository provides inspectable evidence of three kinds of work:</p>
+<table>
+<thead>
+<tr>
+<th>Learning area</th>
+<th>Evidence in the project</th>
+<th>Next competency to develop</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scientific data handling</td>
+<td>FITS ingestion, source receipts, shape checks, retained indices and parity tests</td>
+<td>Instrument calibration and uncertainty propagation</td>
+</tr>
+<tr>
+<td>Scientific reasoning</td>
+<td>Separate provenance, distribution and temporal gates; documented negative result</td>
+<td>Multi-observation evaluation and signal-processing design</td>
+</tr>
+<tr>
+<td>Optics and feedback</td>
+<td>Noll basis, pupil-phase FFT, bounded delayed modal feedback</td>
+<td>Calibrated reconstruction and conventional AO control formulations</td>
+</tr>
+<tr>
+<td>Research software</td>
+<td>Worker-based UI, numerical tests, reproducible generated evidence and CI</td>
+<td>Independent review and wider cross-platform testing</td>
+</tr>
+</tbody>
+</table>
+<p>These are concrete learning outputs, not a claim of expert mastery. The central learning outcomes are explaining the data lineage, reproducing the reported values, distinguishing measured quantities from model outputs and justifying the limitations.</p>
+<h2 id="9-reproduction-and-demonstration">9. Reproduction and demonstration</h2>
+<p>Use Node 24 and Python 3.12 with the pinned dependencies:</p>
+<pre><code class="language-bash">python -m pip install -r requirements.txt
+npm ci --ignore-scripts
+npm run check
+python research/audit_telemetry.py
+python tools/validate_observations.py
+python tools/validate_model.py
+python tools/build_reports.py
+git diff --exit-code -- research/generated data/validation_summary.csv report.html summary.html
+python -m http.server 8000
+</code></pre>
+<p>Open <code>http://localhost:8000/</code> for the overview and <code>/lab.html</code> for the lab. Serve over HTTP: opening the HTML as a local file is not the supported worker/fetch path.</p>
+<p>Tests call the deployed science core and actual worker FFT. They check numerical invariants and selected controlled cases; passing tests is not validation of the model against CIAO physics. The CI workflow also regenerates scientific evidence and checks for drift.</p>
+<p>To explore the project, start with the overview, trace a retained frame in the lab, and read the temporal-gate interpretation. Switching simulation on opens the independent teaching model, not a reconstruction of the observation.</p>
+<h2 id="10-proposed-next-study">10. Proposed next study</h2>
+<p>The next experiment is <strong>not yet an achieved result</strong>: compare stride sampling against an anti-aliased reduction of the full-rate telemetry.</p>
+<p>Before running it, specify the target bandwidth, filter design and attenuation, time alignment, edge handling, and acceptance thresholds. Preserve the unfiltered reference and compare in-band spectra and time-domain errors. Test multiple observations if available, and report uncertainty and failure cases. Filtering the raw channels before nonlinear RMS aggregation is not equivalent to filtering an already aggregated diagnostic; the experiment must state which quantity it preserves.</p>
+<p>A subsequent calibrated reconstruction would require establishing which calibration products are available. I should not claim a reconstructed residual phase or controller improvement until that chain is justified.</p>
+<h2 id="references-and-attribution">References and attribution</h2>
+<ol>
+<li>Gomes et al. (2023), <a href="https://doi.org/10.5281/zenodo.8192742">Proof-of-concept AO telemetry data using the AOT standard format</a>. Source data: CC BY 4.0.</li>
+<li>Gomes et al. (2024), <a href="https://doi.org/10.1051/0004-6361/202348486">Adaptive optics telemetry standard: Design and specification of a novel data exchange format</a>, A&amp;A 686, A7.</li>
+<li>Noll (1976), <a href="https://doi.org/10.1364/JOSA.66.000207">Zernike polynomials and atmospheric turbulence</a>, JOSA 66, 207–211.</li>
+</ol>
+<p>See <a href="METHODS.md">methods</a>, the <a href="CLAIMS.md">claim ledger</a>, <a href="CITATION.cff">citation metadata</a> and <a href="LICENSE">software licence</a>. The overview, report and project summary summarise the same committed evidence; they do not introduce a new observational result.</p>
+</article></main>
+<footer class="site-footer">Biswajit Jana · AO telemetry and learning project · Generated from the committed Markdown source.</footer>
+</body></html>

@@ -31,7 +31,7 @@ W(rho, theta, t) = sum_j a_j(t) Z_j(rho, theta)
 Controlled terms use Noll indices `J4=(2,0)`, `J5=(2,-2)`, `J6=(2,2)`, `J7=(3,-1)`,
 `J8=(3,1)` and `J11=(4,0)`. Coefficients are model optical path error in waves RMS.
 
-## Optional Modal PID Deformable Mirror
+## Optional Custom Accumulating Modal Correction
 
 For each simulated coefficient, a latency-delayed and noise-perturbed residual drives:
 
@@ -42,6 +42,16 @@ u_j[k+1] = u_j[k] + Kp e_j[k] + Ki I_j[k] + Kd (e_j[k] - e_j[k-1]) / dt
 ```
 
 The simulated pupil residual is `W_res = W_input - W_DM`.
+
+The implemented integral is clipped to ±2, each correction increment to ±0.25,
+and the accumulated correction to ±3 waves. Error is delayed and perturbed by
+seeded noise before the update. This custom recurrence accumulates its proportional
+term; it is not a standard positional or velocity-form PID. Ki=0 does not imply
+a persistent static offset. See the actual worker runtime test for one controlled
+static case; positive gains do not guarantee stability for all delays.
+
+The conversion wavelength changes only residual OPD: nanometres = waves × wavelength
+in nanometres. It does not change the dimensionless pupil-phase or PSF calculation.
 
 ## Optional Image-Quality Products
 

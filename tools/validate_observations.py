@@ -49,6 +49,11 @@ def main() -> None:
         raise ValueError("Audit source receipt is stale")
     if audit["browser_product"]["sha256"] != EXPECTED_PRODUCT_SHA256:
         raise ValueError("Audit browser-product receipt is stale")
+    counts = {name: sum(len(row) for row in telemetry[name]) for name in ("gradientX", "gradientY", "subapertureIntensity", "hodmPosition")}
+    if audit["browser_product"]["retained_value_counts"] != counts or sum(counts.values()) != 79200:
+        raise ValueError("Retained telemetry count receipt is incorrect")
+    if audit["browser_product"]["retained_telemetry_values"] != sum(counts.values()):
+        raise ValueError("Total retained telemetry count is incorrect")
     conclusions = audit["conclusions"]
     if not conclusions["provenance_gate_passed"] or not conclusions["distribution_gate_passed"]:
         raise ValueError("Reviewed provenance or distribution gate no longer passes")

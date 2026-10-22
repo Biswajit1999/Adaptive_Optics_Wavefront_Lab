@@ -121,6 +121,7 @@
     }
 
     render(bytes, textureWidth, textureHeight, positive = false, square = false) {
+      this.lastRender = [bytes, textureWidth, textureHeight, positive, square];
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
       const rect = this.canvas.getBoundingClientRect();
       const width = Math.max(10, Math.round(rect.width * ratio));
@@ -155,6 +156,7 @@
     }
 
     render(history) {
+      this.lastRender = history;
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
       const rect = this.canvas.getBoundingClientRect();
       const width = Math.max(10, Math.round(rect.width));
@@ -256,12 +258,19 @@
     document.getElementById("latency-value").textContent =
       `${Number(controls.latency.value).toFixed(0)} frames`;
     modelControls.classList.toggle("inactive", !controls.modelOverlay.checked);
+    modelControls.querySelectorAll("input").forEach((input) => { input.disabled = !controls.modelOverlay.checked; });
+    document.getElementById("frame-seek").disabled = controls.modelOverlay.checked;
+    document.getElementById("mode-boundary").textContent = controls.modelOverlay.checked
+      ? "TEACHING MODEL — synthetic modes and custom accumulating feedback; not a reconstruction of CIAO."
+      : "OBSERVATION — recorded channel × time matrices, not pupil images. Header Strehl is fixed metadata.";
+    buttons.reset.textContent = controls.modelOverlay.checked ? "RESET MODEL" : "REWIND";
   }
 
   function status(name, light, text) {
     output.engine.textContent = name;
     output.engineLight.className = light;
     output.status.textContent = text;
+    document.getElementById("error-notice").hidden = name !== "FAILED";
   }
 
   function log(text) {
@@ -279,13 +288,13 @@
       "incoming-title": "SIMULATED INCOMING WAVEFRONT",
       "incoming-note": "NOLL BASIS / WAVES",
       "mirror-title": "SIMULATED DEFORMABLE MIRROR",
-      "mirror-note": "PID COMMAND SURFACE",
+      "mirror-note": "CUSTOM ACCUMULATING CORRECTION",
       "residual-title": "SIMULATED RESIDUAL ERROR",
       "residual-note": "W - DM / WAVES",
       "psf-title": "SIMULATED PSF",
       "psf-note": "FFT INTENSITY",
       "history-title": "MODEL CLOSED-LOOP TELEMETRY",
-      "history-note": "RESIDUAL RMS VS VIRTUAL TIME / ALTER Ki TO REVEAL OFFSET",
+      "history-note": "RESIDUAL RMS VS VIRTUAL TIME / NOT CIAO TELEMETRY",
       "table-title": "MODEL ACTIVE MODES",
       "table-note": "NOLL INDEX TABLE",
       "col-a": "J", "col-b": "(n,m)", "col-c": "NAME", "col-d": "RESIDUAL",
@@ -293,7 +302,7 @@
       "metric-b-title": "RESIDUAL RMS", "metric-b-unit": "WAVES",
       "metric-c-title": "STREHL", "metric-c-unit": "MARECHAL MODEL",
       "metric-d-title": "PSF PEAK", "metric-d-unit": "FFT / IDEAL",
-      "metric-e-title": "SERVO ERROR", "metric-e-unit": "MODAL RMS",
+      "metric-e-title": "RESIDUAL OPD", "metric-e-unit": "NM / CONVERSION WAVELENGTH",
     } : {
       "incoming-title": "WFS GRADIENT X",
       "incoming-note": "68 SUBAPERTURES x RELEASED TIME",
@@ -365,6 +374,13 @@
       message.textures.command.height, false, false
     );
     state.history.render(message.history);
+    const surfaces = { incoming: "gradientX", mirror: "gradientY", residual: "intensity", psf: "command" };
+    for (const [id, name] of Object.entries(surfaces)) {
+      const texture = message.textures[name];
+      const lower = texture.positive ? texture.lower : -texture.upper;
+      document.getElementById(id + "-scale").textContent =
+        `Colour: ${lower.toPrecision(4)} to ${texture.upper.toPrecision(4)} (native units; clipped). X: 0–29.89 s; Y: channel 0–${texture.height - 1}, top to bottom.`;
+    }
     log(`CIAO1 AOT loaded / ${message.source.originalFrameCount} released frames / ${message.processing.selectedFrameCount} displayed`);
     status("ONLINE", "online", "RELEASED AOT TELEMETRY ACTIVE / SIMULATION OFF");
   }
@@ -374,6 +390,9 @@
       return;
     }
     const telemetry = message.telemetry;
+    document.getElementById("frame-seek").value = telemetry.frame;
+    document.getElementById("frame-label").textContent = `Sample ${telemetry.frame + 1}/300 · source frame ${telemetry.sourceFrameIndex} · ${telemetry.timeSeconds.toFixed(3)} s`;
+    document.querySelectorAll(".view").forEach((view) => view.style.setProperty("--cursor", (100 * telemetry.frame / 299) + "%"));
     output.loopTime.textContent = `${telemetry.timeSeconds.toFixed(3)} s`;
     output.inputRms.textContent = telemetry.strehlRatio.toFixed(3);
     output.residualRms.textContent = telemetry.gradientRms.toFixed(5);
@@ -395,7 +414,12 @@
     output.residualRms.textContent = telemetry.residualRms.toFixed(5);
     output.strehl.textContent = telemetry.strehl.toFixed(5);
     output.psfPeak.textContent = telemetry.psfPeak.toFixed(5);
-    output.servoError.textContent = telemetry.servoError.toFixed(5);
+    output.servoError.textContent = telemetry.residualOpdNm.toFixed(2);
+    for (const id of ["incoming", "mirror", "residual", "psf"]) {
+      document.getElementById(id + "-scale").textContent = id === "psf"
+        ? "Log intensity, normalised to this frame’s peak; image coordinates are FFT pixels, not arcseconds."
+        : "Colour: −0.75 to +0.75 waves (clipped). Clear unit circular pupil; not an observed map.";
+    }
     output.modeTable.replaceChildren(...message.modes.map((mode) => tableRow([
       `J${mode.j}`, `(${mode.n},${mode.m})`, mode.name, mode.residual.toFixed(4),
     ])));
@@ -404,7 +428,7 @@
     state.maps.residual.render(message.residual, message.gridSize, message.gridSize, false, true);
     state.maps.psf.render(message.psf, message.gridSize, message.gridSize, true, true);
     state.history.render(message.history);
-    status("MODEL", "online", `OPTIONAL PID MODEL ACTIVE / WORKER ${telemetry.computeMilliseconds.toFixed(2)} MS`);
+    status("MODEL", "online", `TEACHING MODEL ACTIVE / WORKER ${telemetry.computeMilliseconds.toFixed(2)} MS`);
   }
 
   function tableRow(values) {
@@ -431,7 +455,7 @@
         residual: new ShaderMap("residual"),
         psf: new ShaderMap("psf"),
       };
-      state.worker = new Worker("assets/js/physicsWorker.js");
+      state.worker = new Worker("assets/js/physicsWorker.js?v=20261022.1");
       state.worker.addEventListener("message", (event) => {
         const message = event.data;
         if (message.type === "observation") {
@@ -469,13 +493,20 @@
   }
 
   Object.values(controls).forEach((control) => {
-    control.addEventListener("input", () => configure(false));
+    const conversionOnly = () => {
+      if (control !== controls.wavelength) return false;
+      labels();
+      state.worker?.postMessage({ type: "setConversionWavelength", wavelengthNm: Number(control.value) });
+      return true;
+    };
+    control.addEventListener("input", () => { if (!conversionOnly()) configure(false); });
     control.addEventListener("change", () => {
+      if (conversionOnly()) return;
       const modeChanged = control === controls.modelOverlay;
       configure(true);
       if (modeChanged) {
         log(controls.modelOverlay.checked
-          ? "Simulation mode enabled / released streams remain available when disabled"
+          ? "Teaching model enabled / independent of released streams"
           : "Returned to released CIAO AOT telemetry");
       }
     });
@@ -501,6 +532,24 @@
     }
     configure(true);
     log("Observation-first defaults restored");
+  });
+  document.getElementById("frame-seek").addEventListener("input", (event) => {
+    state.running = false;
+    buttons.run.textContent = "RESUME STREAM";
+    buttons.run.classList.remove("on");
+    state.worker?.postMessage({ type: "setRunning", running: false });
+    state.worker?.postMessage({ type: "seekObservation", frame: Number(event.target.value) });
+  });
+  document.getElementById("retry").addEventListener("click", () => window.location.reload());
+  let resizeTimer;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      for (const map of Object.values(state.maps || {})) {
+        if (map.lastRender) map.render(...map.lastRender);
+      }
+      if (state.history.lastRender) state.history.render(state.history.lastRender);
+    }, 80);
   });
   start();
 })();

@@ -224,6 +224,10 @@ def main() -> None:
             "effective_sample_rate_hz": rate / STRIDE,
             "nyquist_hz": rate / (2.0 * STRIDE),
             "maximum_fits_parity_error": parity,
+            "retained_value_counts": {name: int(np.asarray(payload["telemetry"][name]).size) for name in ("gradientX", "gradientY", "subapertureIntensity", "hodmPosition")},
+            "retained_telemetry_values": sum(int(np.asarray(payload["telemetry"][name]).size) for name in ("gradientX", "gradientY", "subapertureIntensity", "hodmPosition")),
+            "timestamp_count": int(selected.size),
+            "source_index_count": int(selected.size),
         },
         "predeclared_gates": {
             "provenance_max_absolute_error": ROUNDING_ATOL,

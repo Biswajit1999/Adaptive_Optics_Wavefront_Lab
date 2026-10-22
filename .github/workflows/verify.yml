@@ -42,5 +42,6 @@ jobs:
           python research/audit_telemetry.py
           python tools/validate_observations.py
           python tools/validate_model.py
+          python tools/build_reports.py
           python -m compileall -q research tools
-          git diff --exit-code -- research/generated data/validation_summary.csv
+          git diff --exit-code -- research/generated data/validation_summary.csv report.html summary.html

@@ -35,8 +35,9 @@ Marechal Strehl degradation.
 | Initial application load | Four WebGL maps show released CIAO telemetry; metrics identify released Strehl and loop rate. |
 | Play or pause observation stream | Per-frame measured readouts advance or hold without changing the heatmap data product. |
 | Enable `SIMULATION MODE` | Panels are relabelled as simulated wavefront, mirror, residual and PSF products. |
-| In model mode set turbulence and WFS noise to zero | Positive PID gains drive residual toward zero and model Strehl toward unity. |
-| In model mode reduce `Ki` | Slowly varying simulated residual offsets persist for longer. |
+| Static controlled test: turbulence/noise=0, Kp=0.1, Ki=Kd=0, delay=0 | The accumulating proportional correction reduces static residual below 1e-10 waves after 1,000 steps. This is one tested configuration, not a general stability guarantee. |
+| Double conversion wavelength while paused | Residual OPD in nm doubles; fixed-wave residual and dimensionless FFT peak do not change. |
+| Drag retained-sample slider | Playback pauses; readouts and cursor identify the selected source frame. |
 | Disable `SIMULATION MODE` | The view returns to unchanged released AOT telemetry. |
 
 ## Interpretation Boundary

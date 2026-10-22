@@ -1,215 +1,98 @@
 # Adaptive Optics Wavefront Lab
 
-**An observation-first WebGL console for released adaptive-optics telemetry and optional
-Noll-index closed-loop experiments.**
+**A learning project connecting astronomical instrumentation, feedback control and trustworthy telemetry processing.**
+Author: Biswajit Jana · Public CIAO AOT data · Separate optical/control teaching model
 
-Adaptive Optics Wavefront Lab boots into recorded adaptive-optics telemetry from ESO CIAO,
-distributed through the Adaptive Optics Telemetry (AOT) proof-of-concept data release. It
-shows actual Shack-Hartmann wavefront-sensor streams and high-order deformable-mirror commands.
-Only after the user enables `SIMULATION MODE` does the console present generated pupil phase,
-PID control and point-spread-function products.
+[Research overview](https://biswajit1999.github.io/Adaptive_Optics_Wavefront_Lab/) · [Project at a glance](https://biswajit1999.github.io/Adaptive_Optics_Wavefront_Lab/summary.html) · [Project report](https://biswajit1999.github.io/Adaptive_Optics_Wavefront_Lab/report.html) · [Interactive lab](https://biswajit1999.github.io/Adaptive_Optics_Wavefront_Lab/lab.html)
 
-## v3.0 research result
+## Why this project
 
-The 300-frame browser product is now audited against all 15,000 released CIAO1
-frames. Every retained value passes exact source parity within the declared
-six-decimal rounding. The retained gradient-RMS, command-RMS and mean-flux
-distributions also pass predeclared mean and percentile gates.
+I want to connect instrumentation and feedback control to astronomical imaging, and learn wavefront sensing and adaptive optics through real telemetry. The project asks a concrete question: **what information survives reducing a 15,000-frame observation to a 300-frame browser display?**
 
-The temporal-fidelity null is rejected: 20.89%, 9.19% and 64.46% of full-rate
-windowed power respectively lies above the reduced product's 5 Hz Nyquist
-frequency. The browser data is therefore a sparse visual and distributional
-overview—not evidence for temporal spectra, loop bandwidth, transfer functions,
-or CIAO controller reconstruction. See [METHODS.md](METHODS.md),
-[CLAIMS.md](CLAIMS.md), and the
-[machine-readable audit](research/generated/telemetry-decimation-audit.json).
+It is a reproducible inspection and learning workflow, not a newly built AO instrument or a calibrated reconstruction of CIAO.
 
-
-## Released Telemetry Product
-
-The retained FITS source is:
+## What I built
 
 ```text
-CIAO1_2019-12-06_DATA_EXPO-015808.fits
-https://zenodo.org/records/8192742
-doi:10.5281/zenodo.8192742
+Public CIAO AOT FITS (15,000 frames, 499.962 Hz)
+    → stride-50 selection + explicit frame indices
+    → rounded browser JSON (300 frames, 9.99924 Hz)
+    → independent provenance / distribution / temporal audit
+    → observation-first interactive laboratory
+
+Separate learning branch:
+six Noll modes → custom accumulating feedback → residual phase → FFT diagnostic
 ```
 
-Zenodo records the file as part of the AOT standard demonstration data, derived from ESO
-programme `60.A-9278(B)` and licensed under Creative Commons Attribution 4.0 International.
-The local retained source matches the published MD5:
+The retained channels contain **79,200 telemetry values**: 300 × (68 X gradients + 68 Y gradients + 68 intensities + 60 commands), plus 300 timestamps and 300 indices.
 
-```text
-069b37b24997bf55c5312a7bad469502
-```
+## What the evidence supports
 
-Its AOT/FITS metadata identifies:
-
-| Item | Released value |
-| --- | --- |
-| Instrument | CIAO |
-| AO mode | SCAO |
-| Observation start | `2019-12-07T01:58:09.100420` UTC |
-| Guide source | Natural Guide Star |
-| Sensor | Shack-Hartmann |
-| Corrector | High Order Deformable Mirror |
-| Loop state and rate | Closed, `499.962 Hz` |
-| Released loop frames | `15,000` |
-| Header `STREHL-R` | `0.71` |
-
-The browser asset retains every fiftieth released frame, yielding 300 display samples while
-keeping the original FITS file locally for provenance and reproducible regeneration. It
-contains the released AOT extensions:
-
-| Extension | Display role | Dimensions in source |
-| --- | --- | ---: |
-| `GRADIENTS` | WFS slope X and Y telemetry maps | `15000 x 2 x 68` |
-| `INTENSITIES` | WFS subaperture-flux telemetry map | `15000 x 68` |
-| `HODM POSITIONS` | Recorded high-order mirror commands | `15000 x 60` |
-
-These streams are measured telemetry, not reconstructed pupil optical path error. The
-observation view therefore does not infer an incoming wavefront phase map or a PSF from them.
-
-## Instrument Capabilities
-
-- Observation-first WebGL heatmaps for recorded WFS gradient X/Y, WFS subaperture intensity
-  and HODM command streams.
-- Recorded telemetry playback with released header Strehl, per-frame slope RMS, command RMS,
-  mean flux and loop-rate readouts.
-- Worker-side loading and texture preparation so the UI thread uploads compact display maps.
-- Optional simulation mode, disabled by default, for physically declared Noll-index/PID
-  experiments.
-- GLSL pupil rendering and worker-side FFT PSF generation in model mode.
-- Adjustable proportional and integral gains for servo-lag and baseline-offset experiments.
-- Zero-build HTML/CSS/JavaScript deployment.
-
-## Architecture
-
-```text
-Adaptive Optics Wavefront Lab/
-  index.html
-  assets/
-    css/style.css
-    js/app.js                       WebGL presentation and controls
-    js/science-core.js              directly tested Noll/PID/statistics core
-    js/physicsWorker.js             AOT telemetry loading and optional model
-  data/observations/
-    CIAO1_2019-12-06_DATA_EXPO-015808.fits
-    ciao1_aot_telemetry.json        Browser-reduced released streams
-    ciao1_aot_metadata.json
-  docs/
-    equations.md
-    validation.md
-  tools/
-    fetch_aot_observations.py
-    validate_observations.py
-    validate_model.py
-    strehl_table.py
-  research/
-    audit_telemetry.py              full-rate sampling/provenance experiment
-    generated/                      deterministic JSON and CSV evidence
-```
-
-The worker has two explicit paths. In observation mode, it loads and scales only released AOT
-streams for rendering. In simulation mode, it uses the Noll/PID/FFT model described below.
-There is no synthetic fallback if the observation asset cannot be loaded.
-
-## Optional Noll/PID Model
-
-The generated optical path error uses unit-RMS Zernike polynomials over the circular pupil:
-
-```text
-W(rho, theta) = sum_j a_j Z_j(rho, theta)
-```
-
-The controlled Noll modes are:
-
-| Noll index | `(n, m)` | Aberration |
+| Test | Result | Boundary |
 | --- | --- | --- |
-| `J4` | `(2, 0)` | Defocus |
-| `J5` | `(2, -2)` | Astigmatism -2 |
-| `J6` | `(2, 2)` | Astigmatism +2 |
-| `J7` | `(3, -1)` | Coma -1 |
-| `J8` | `(3, 1)` | Coma +1 |
-| `J11` | `(4, 0)` | Primary spherical |
+| Source-to-browser parity | Pass | Every retained value matches within the six-decimal rounding tolerance. |
+| Three diagnostic distributions | Pass | Means and 5/50/95 percentiles meet repository-specific thresholds. |
+| Temporal fidelity of the reduction | Fail | Above-reduced-Nyquist power is 20.89%, 9.19% and 64.46%, exceeding the 5% gate. |
 
-For residual modal error `e_j`, the optional discrete mirror controller is:
+**A faithful point sample is not necessarily a faithful time series.** This product supports a sparse overview and the tested coarse summaries, not temporal spectra, loop bandwidth or controller identification. The negative result concerns the reduction, not the telescope.
 
-```text
-I_j[k] = I_j[k-1] + e_j[k] dt
-u_j[k+1] = u_j[k] + Kp e_j[k] + Ki I_j[k] + Kd (e_j[k] - e_j[k-1]) / dt
-```
+See [methods](METHODS.md), [claim ledger](CLAIMS.md) and [generated evidence](research/generated/telemetry-decimation-audit.json).
 
-Lower integral gain allows slowly varying residual baseline error to persist; additional
-latency exposes servo lag. These quantities are model experiments and are not claimed to be
-the CIAO system controller reconstruction.
+## Explore the project
 
-The model-mode Strehl estimate is the Marechal approximation for residual RMS in waves:
+1. Read the [project summary](PROJECT_SUMMARY.md) for motivation, contribution and findings.
+2. Read the [full report](PROJECT_REPORT.md) for definitions, results, limits and reproduction.
+3. Open the lab with simulation OFF. Inspect source-frame indices and numeric colour scales.
+4. Turn simulation ON only after explaining that it is a separate teaching experiment.
 
-```text
-S approximately exp[-(2 pi sigma_res)^2]
-```
+The HTML summary and report have print styles; use the browser's Print → Save as PDF if you want an attachment.
 
-The model PSF panel separately evaluates:
+## Run and verify
 
-```text
-PSF = | FFT2 { P(rho,theta) exp[i 2 pi W_res(rho,theta)] } |^2
-```
-
-## Running
-
-Serve this directory over HTTP:
-
-```bash
-python -m http.server 8000
-```
-
-Open `http://localhost:8000/`. WebGL is required; no build step or JavaScript dependency
-installation is required.
-
-To recreate the browser data asset from the official FITS release:
-
-```bash
-python tools/fetch_aot_observations.py
-```
-
-The converter requires Python, `numpy` and `astropy`; a download is required only when the
-retained source FITS file is absent.
-
-## Verification
+Use Node 24 and Python 3.12:
 
 ```bash
 python -m pip install -r requirements.txt
+npm ci --ignore-scripts
+npm run check
 python research/audit_telemetry.py
 python tools/validate_observations.py
 python tools/validate_model.py
-npm run check
-git diff --exit-code -- research/generated data/validation_summary.csv
+python tools/build_reports.py
+git diff --exit-code -- research/generated data/validation_summary.csv report.html summary.html
+python -m http.server 8000
 ```
 
-The observation audit checks the published MD5, local SHA-256 receipt, exact
-FITS-to-browser value parity, distributional representativeness, and the reduced
-sample's temporal boundary. JavaScript tests call the same science core imported
-by the deployed worker. These are integrity and numerical checks, not a CIAO PSF
-reconstruction.
+Visit `http://localhost:8000/`. Serve over HTTP rather than opening a file URL. The lab requires WebGL and Web Workers; the overview and report do not.
 
-## References
+## Repository map
 
-Gomes, T., Garcia, P., Correia, C. and Morujao, N. (2023) *Proof-of-concept AO telemetry
-data using the AOT standard format*. Zenodo. doi:
-[10.5281/zenodo.8192742](https://doi.org/10.5281/zenodo.8192742).
+| Path | Purpose |
+| --- | --- |
+| `index.html`, `report.html`, `summary.html` | Public-facing overview and generated printable documents |
+| `lab.html`, `assets/js/` | Observation console and isolated teaching model |
+| `data/observations/` | Retained FITS source, JSON product and provenance |
+| `research/audit_telemetry.py` | Full-rate/reduced-product fidelity audit |
+| `research/generated/` | Deterministic numerical receipts |
+| `tests/`, `tools/` | Deployed-core/worker tests and report generation |
+| `METHODS.md`, `CLAIMS.md` | Evaluation protocol and scientific claim boundaries |
 
-Gomes, T. et al. (2024) 'Adaptive optics telemetry standard: Design and specification of a
-novel data exchange format', *Astronomy & Astrophysics*, 686, A7. doi:
-[10.1051/0004-6361/202348486](https://doi.org/10.1051/0004-6361/202348486).
+## Model boundaries
 
-Noll, R.J. (1976) 'Zernike polynomials and atmospheric turbulence', *Journal of the Optical
-Society of America*, 66(3), pp. 207-211.
+Six unit-RMS Noll modes on a clear pupil, seeded synthetic disturbances/noise, and custom accumulating modal feedback support exploration. The model is not fitted to the released observation. Its proportional contribution accumulates, so Ki=0 does not necessarily leave a static offset. The wavelength slider converts residual waves to OPD nanometres; it is not a chromatic propagation model.
 
-Roddier, F. (ed.) (1999) *Adaptive Optics in Astronomy*. Cambridge: Cambridge University
-Press.
+Header Strehl 0.71 is fixed released metadata. Neither gradient RMS nor command RMS is a calibrated wavefront-error measurement. The FFT image uses per-frame logarithmic display scaling, and Maréchal is a small-phase approximation.
 
-## Licence
+## Learning and next study
 
-Application source is released under the MIT Licence; see `LICENSE`. The bundled AOT
-observational product is attributed to its authors and distributed under CC BY 4.0.
+The concrete outputs demonstrate practice in FITS provenance, dimensional checks, validation design, Zernike/FFT concepts and reproducible research software. They do not establish expert mastery or improved on-sky performance. AI-assisted development and review were used; understanding and reproducing the work remain my responsibility.
+
+The next **proposed** study is anti-aliased reduction, with bandwidth, filters, edge handling and evaluation criteria specified before comparing results. A calibrated reconstruction requires additional instrument products and justification.
+
+## Data attribution and citation
+
+Gomes et al., [Proof-of-concept AO telemetry data using the AOT standard format](https://doi.org/10.5281/zenodo.8192742), CC BY 4.0. The release description associates CIAO with programme **60.A-9278(C)**. The retained filename contains 2019-12-06; its observation metadata starts on 2019-12-07 UTC.
+
+[AOT specification paper](https://doi.org/10.1051/0004-6361/202348486) · [Noll (1976)](https://doi.org/10.1364/JOSA.66.000207) · [CITATION.cff](CITATION.cff) · [Software licence](LICENSE)
+
+The source teams acquired the observation. This project's contribution is the learning, processing, inspection and validation workflow.

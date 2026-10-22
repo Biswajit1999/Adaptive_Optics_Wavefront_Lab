@@ -1,206 +1,99 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0b0f19">
-    <meta
-      name="description"
-      content="Observation-first adaptive optics telemetry console for released ESO CIAO AOT data with optional Noll-index PID modelling."
-    >
-    <title>Adaptive Optics Wavefront Lab | CIAO AOT Telemetry Console</title>
-    <link rel="icon" href="data:,">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <script src="assets/js/app.js" defer></script>
-  <!-- Search discovery metadata: maintained by the portfolio indexing workflow. -->
-  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f3ee">
+  <meta name="description" content="Biswajit Jana's adaptive optics study: a reproducible CIAO telemetry pipeline, sampling-fidelity audit, and a separate wavefront-control teaching model.">
+  <title>Adaptive Optics Wavefront Lab — Biswajit Jana</title>
   <link rel="canonical" href="https://biswajit1999.github.io/Adaptive_Optics_Wavefront_Lab/">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/css/research.css?v=20261022.1">
+  <meta property="og:title" content="Adaptive Optics Wavefront Lab — from telemetry to evidence">
+  <meta property="og:description" content="Why I studied adaptive optics, what I built, and what a sampling audit taught me about scientific interpretation.">
   <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Biswajit Jana — Research Software">
-  <meta property="og:title" content="Adaptive Optics Wavefront Lab | CIAO AOT Telemetry Console">
-  <meta property="og:description" content="Observation-first adaptive optics telemetry console for released ESO CIAO AOT data with optional Noll-index PID modelling.">
   <meta property="og:url" content="https://biswajit1999.github.io/Adaptive_Optics_Wavefront_Lab/">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="Adaptive Optics Wavefront Lab | CIAO AOT Telemetry Console">
-  <meta name="twitter:description" content="Observation-first adaptive optics telemetry console for released ESO CIAO AOT data with optional Noll-index PID modelling.">
-  <script id="search-structured-data" type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "@id": "https://biswajit1999.github.io/Adaptive_Optics_Wavefront_Lab/#application",
-  "name": "Adaptive Optics Wavefront Lab | CIAO AOT Telemetry Console",
-  "description": "Observation-first adaptive optics telemetry console for released ESO CIAO AOT data with optional Noll-index PID modelling.",
-  "url": "https://biswajit1999.github.io/Adaptive_Optics_Wavefront_Lab/",
-  "codeRepository": "https://github.com/Biswajit1999/Adaptive_Optics_Wavefront_Lab",
-  "author": {
-    "@type": "Person",
-    "name": "Biswajit Jana",
-    "url": "https://github.com/Biswajit1999"
-  },
-  "applicationCategory": "EducationalApplication",
-  "operatingSystem": "Any",
-  "browserRequirements": "Requires a modern web browser",
-  "isAccessibleForFree": true,
-  "keywords": [
-    "astronomy",
-    "astrophysics",
-    "scientific computing",
-    "adaptive optics",
-    "wavefront sensing",
-    "astronomical instrumentation",
-    "PID control",
-    "feedback systems",
-    "instrumentation"
-  ],
-  "dateModified": "2026-10-04",
-  "inLanguage": "en"
-}
-  </script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareSourceCode","name":"Adaptive Optics Wavefront Lab","description":"Observation-first CIAO telemetry inspection, sampling-fidelity audit and a separate adaptive-optics teaching model.","version":"3.1.0","author":{"@type":"Person","name":"Biswajit Jana"},"codeRepository":"https://github.com/Biswajit1999/Adaptive_Optics_Wavefront_Lab","url":"https://biswajit1999.github.io/Adaptive_Optics_Wavefront_Lab/","dateModified":"2026-10-22","license":"https://opensource.org/license/mit","programmingLanguage":["JavaScript","Python"]}</script>
 </head>
-  <body>
-    <div class="instrument">
-      <header class="topbar">
-        <section class="brand">
-          <p>AOT TELEMETRY RELEASE / ESO CIAO1 / CLOSED-LOOP OBSERVATION</p>
-          <h1>AO WAVEFRONT LAB</h1>
-          <span>RELEASED WFS AND MIRROR STREAMS FIRST / OPTIONAL NOLL-PID MODEL</span>
-        </section>
-        <dl class="health">
-          <div><dt>ENGINE</dt><dd><i id="engine-light"></i><span id="engine">BOOT</span></dd></div>
-          <div><dt>UTC</dt><dd id="utc">--:--:--</dd></div>
-          <div><dt>FRAME RATE</dt><dd id="fps">-- FPS</dd></div>
-          <div><dt>DATA TIME</dt><dd id="loop-time">-- s</dd></div>
-        </dl>
-        <nav>
-          <button id="run" class="on" type="button">PAUSE STREAM</button>
-          <button id="reset" type="button">RESET MODEL</button>
-          <button id="defaults" type="button">DEFAULTS</button>
-        </nav>
-      </header>
-
-      <main class="layout">
-        <aside class="panel controls">
-          <header><h2>CONTROL MATRIX</h2><span>DATA / MODEL BOUNDARY</span></header>
-          <fieldset class="dataset">
-            <legend>OBSERVED AOT PRODUCT</legend>
-            <label>DATASET
-              <select id="dataset">
-                <option value="CIAO1" selected>ESO CIAO1 / AT1 / 2019-12-07</option>
-              </select>
-            </label>
-            <label>PLAYBACK <output id="playbackRate-value">1.00 x</output>
-              <input id="playbackRate" type="range" min="0.25" max="8" step="0.25" value="1">
-            </label>
-            <label class="toggle">SIMULATION MODE <output id="modelOverlay-value">OFF</output>
-              <input id="modelOverlay" type="checkbox">
-            </label>
-            <p class="dataset-note">Zenodo DOI 10.5281/zenodo.8192742 / AOT v1.0.0 / CC BY 4.0</p>
-            <p class="dataset-note sampling-boundary">Browser view: every 50th frame / 9.999 Hz effective sample rate / 5.000 Hz Nyquist. Sparse overview only—not a temporal-spectrum or closed-loop bandwidth product.</p>
-          </fieldset>
-          <div id="model-controls" class="model-controls inactive">
-            <fieldset>
-              <legend>NOLL MODE INJECTION</legend>
-              <label>J4 / DEFOCUS <output id="z4-value">0.220</output>
-                <input id="z4" type="range" min="-1" max="1" step="0.001" value="0.22">
-              </label>
-              <label>J5 / ASTIG -2 <output id="z5-value">0.120</output>
-                <input id="z5" type="range" min="-1" max="1" step="0.001" value="0.12">
-              </label>
-              <label>J6 / ASTIG +2 <output id="z6-value">-0.180</output>
-                <input id="z6" type="range" min="-1" max="1" step="0.001" value="-0.18">
-              </label>
-              <label>J7 / COMA -1 <output id="z7-value">0.160</output>
-                <input id="z7" type="range" min="-1" max="1" step="0.001" value="0.16">
-              </label>
-              <label>J8 / COMA +1 <output id="z8-value">0.060</output>
-                <input id="z8" type="range" min="-1" max="1" step="0.001" value="0.06">
-              </label>
-              <label>J11 / SPHERICAL <output id="z11-value">0.080</output>
-                <input id="z11" type="range" min="-1" max="1" step="0.001" value="0.08">
-              </label>
-            </fieldset>
-            <fieldset>
-              <legend>MODEL ATMOSPHERE / SENSOR</legend>
-              <label>DYNAMIC SEEING <output id="turbulence-value">0.080 waves</output>
-                <input id="turbulence" type="range" min="0" max="0.6" step="0.001" value="0.08">
-              </label>
-              <label>WFS NOISE <output id="sensorNoise-value">0.002 waves</output>
-                <input id="sensorNoise" type="range" min="0" max="0.1" step="0.001" value="0.002">
-              </label>
-              <label>WAVELENGTH <output id="wavelength-value">1650 nm</output>
-                <input id="wavelength" type="range" min="400" max="2400" step="10" value="1650">
-              </label>
-            </fieldset>
-            <fieldset>
-              <legend>PID CONTROLLER MODEL</legend>
-              <label>PROPORTIONAL Kp <output id="kp-value">0.320</output>
-                <input id="kp" type="range" min="0" max="1.2" step="0.001" value="0.32">
-              </label>
-              <label>INTEGRAL Ki <output id="ki-value">0.060</output>
-                <input id="ki" type="range" min="0" max="1.2" step="0.001" value="0.06">
-              </label>
-              <label>DERIVATIVE Kd <output id="kd-value">0.002</output>
-                <input id="kd" type="range" min="0" max="0.05" step="0.001" value="0.002">
-              </label>
-              <label>LOOP RATE <output id="loopRate-value">200 Hz</output>
-                <input id="loopRate" type="range" min="20" max="1000" step="10" value="200">
-              </label>
-              <label>LATENCY <output id="latency-value">2 frames</output>
-                <input id="latency" type="range" min="0" max="20" step="1" value="2">
-              </label>
-            </fieldset>
-          </div>
-        </aside>
-
-        <section class="science">
-          <section class="metrics">
-            <article><h2 id="metric-a-title">RELEASED STREHL-R</h2><strong id="input-rms">--</strong><span id="metric-a-unit">FITS HEADER</span></article>
-            <article><h2 id="metric-b-title">WFS GRADIENT RMS</h2><strong id="residual-rms">--</strong><span id="metric-b-unit">NATIVE AOT VALUE</span></article>
-            <article><h2 id="metric-c-title">HODM RMS</h2><strong id="strehl">--</strong><span id="metric-c-unit">RECORDED COMMAND</span></article>
-            <article><h2 id="metric-d-title">LOOP RATE</h2><strong id="psf-peak">--</strong><span id="metric-d-unit">RELEASED METADATA</span></article>
-            <article><h2 id="metric-e-title">MEAN FLUX</h2><strong id="servo-error">--</strong><span id="metric-e-unit">SUBAPERTURE INTENSITY</span></article>
-          </section>
-          <section class="heatmaps">
-            <article class="panel view"><header><h2 id="incoming-title">WFS GRADIENT X</h2><span id="incoming-note">68 SUBAPERTURES x RELEASED TIME</span></header><canvas id="incoming"></canvas></article>
-            <article class="panel view"><header><h2 id="mirror-title">WFS GRADIENT Y</h2><span id="mirror-note">68 SUBAPERTURES x RELEASED TIME</span></header><canvas id="mirror"></canvas></article>
-            <article class="panel view"><header><h2 id="residual-title">SUBAPERTURE INTENSITY</h2><span id="residual-note">RECORDED WFS FLUX STREAM</span></header><canvas id="residual"></canvas></article>
-            <article class="panel view psf"><header><h2 id="psf-title">HODM POSITIONS</h2><span id="psf-note">60 RECORDED ACTUATOR COMMANDS</span></header><canvas id="psf"></canvas></article>
-          </section>
-          <article class="panel history">
-            <header><h2 id="history-title">RELEASED TELEMETRY TREND</h2><span id="history-note">WFS GRADIENT RMS VS SAMPLED AOT TIME</span></header>
-            <canvas id="history"></canvas>
-          </article>
-        </section>
-
-        <aside class="right">
-          <article class="panel readout">
-            <header><h2 id="table-title">OBSERVATION CHANNELS</h2><span id="table-note">AOT FITS EXTENSIONS</span></header>
-            <table>
-              <thead><tr><th id="col-a">STREAM</th><th id="col-b">N</th><th id="col-c">TYPE</th><th id="col-d">CURRENT</th></tr></thead>
-              <tbody id="mode-table"></tbody>
-            </table>
-          </article>
-          <article class="panel evidence" id="research-evidence">
-            <header><h2>DECIMATION AUDIT</h2><span>PREDECLARED GATES / v3.0.0</span></header>
-            <p><strong>FITS → browser parity: PASS.</strong> All 103,800 retained numeric values and 300 frame indices reproduce the selected source frames within the declared six-decimal rounding bound.</p>
-            <p><strong>Distribution gate: PASS.</strong> Mean errors are 0.005–0.041 full-rate SD; largest 5/50/95-percentile errors are 0.012–0.109 full-rate IQR.</p>
-            <p><strong>Temporal gate: FAIL.</strong> Power above the reduced 5 Hz Nyquist is 20.89% for gradient RMS, 9.19% for command RMS, and 64.46% for mean flux.</p>
-            <img src="assets/telemetry-decimation-audit.svg" alt="Bar chart showing power above the browser product Nyquist frequency for gradient RMS, command RMS, and mean flux, all above the five percent temporal-fidelity limit.">
-            <p class="evidence-links"><a href="METHODS.md">Methods</a> / <a href="CLAIMS.md">Claim ledger</a> / <a href="research/generated/telemetry-decimation-audit.json">JSON evidence</a></p>
-          </article>
-          <article class="panel equations">
-            <header><h2>OPTIONAL MODEL KERNEL</h2><span>NOT OBSERVED TELEMETRY</span></header>
-            <p>W = sum a_j Z_j(rho, theta), using Noll indices</p>
-            <p>u[k] = u[k-1] + Kp e + Ki sum(e dt) + Kd de/dt</p>
-            <p>S = exp[-(2 pi sigma_res)^2]</p>
-          </article>
-          <article class="panel events">
-            <header><h2>EVENT LOG</h2><span>DATA / WORKER STATUS</span></header>
-            <ol id="log"><li>Loading released CIAO AOT telemetry...</li></ol>
-          </article>
-        </aside>
-      </main>
-      <footer>AWL v3.0.0 / OBSERVATION-FIRST AO INSTRUMENT <span id="status">LOADING AOT PRODUCT</span> WEBGL MAPS / TESTED WORKER CORE / REVIEWED SNAPSHOT</footer>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <a class="wordmark" href="./"><span class="mark">AO</span> Wavefront Lab</a>
+  <nav aria-label="Project"><a href="#pipeline">Pipeline</a><a href="report.html">Report</a><a href="summary.html">Project at a glance</a><a class="nav-lab" href="lab.html">Open lab ↗</a></nav>
+</header>
+<main id="main">
+  <section class="hero">
+    <div>
+      <p class="eyebrow">Biswajit Jana / independent learning project / 2026</p>
+      <h1>Learning adaptive optics.<br><em>Following the evidence.</em></h1>
+      <p class="lead">How do wavefront measurements become a trustworthy scientific result? I explored this through released ESO CIAO telemetry, a reproducible sampling audit, and a separate wavefront-control model.</p>
+      <div class="actions"><a class="button" href="report.html">Read the project report <span>↗</span></a><a href="lab.html">Explore the telemetry →</a></div>
+      <p class="scope">One released observation · approximately 30 seconds · six modelled aberration modes</p>
     </div>
-  </body>
+    <aside class="result-sheet" aria-labelledby="result-title">
+      <div class="sheet-top"><span>Study result / 01</span><span>CIAO1 · AOT</span></div>
+      <h2 id="result-title">A faithful sample.<br>A limited time series.</h2>
+      <p>Selecting every 50th frame preserves the selected values. It loses the temporal information needed to infer the loop’s dynamics.</p>
+      <dl class="verdicts">
+        <div><dt>Source → browser parity</dt><dd class="pass">Pass</dd></div>
+        <div><dt>Three distribution checks</dt><dd class="pass">Pass</dd></div>
+        <div><dt>Three temporal checks</dt><dd class="fail">Fail</dd></div>
+      </dl>
+      <a href="#results">See the evidence and its limits ↓</a>
+    </aside>
+  </section>
+  <div class="facts" aria-label="Dataset scope">
+    <div><strong>15,000</strong><span>source frames</span></div>
+    <div><strong>300</strong><span>browser samples</span></div>
+    <div><strong>79,200</strong><span>telemetry values checked</span></div>
+    <div><strong>499.962 Hz</strong><span>released loop rate</span></div>
+  </div>
+  <section class="section motivation" id="motivation">
+    <div class="section-label">01 / Starting point</div>
+    <div><h2>Why I wanted to study this</h2><p class="lead">Adaptive optics connects the subjects I want to understand together: astronomical instrumentation, wavefront sensing, and feedback control.</p>
+    <p>My aim was to build intuition from real telemetry while learning how an optical model and controller behave. Working through a public AOT dataset gave me a practical route from file formats and sensor streams to numerical validation and the limits of a claim.</p>
+    <p>The project’s contribution is the software and audit built around an existing release. The observations, instrument, and AOT standard belong to their original teams.</p></div>
+  </section>
+  <section class="section" id="pipeline">
+    <div class="section-label">02 / What I built</div>
+    <h2>A traceable path from FITS to interpretation.</h2>
+    <p class="section-intro">The telemetry pipeline and teaching model answer different questions. The model does not ingest CIAO measurements as reconstructed pupil phase.</p>
+    <ol class="pipeline">
+      <li><span>01</span><h3>Retain the source</h3><p>Official CIAO1 AOT FITS file, published MD5, local SHA-256, metadata, and attribution.</p><a href="METHODS.md">Provenance record ↗</a></li>
+      <li><span>02</span><h3>Prepare a browser product</h3><p>Every 50th frame; timestamps and indices retained; six-decimal JSON values for four streams.</p><a href="https://github.com/Biswajit1999/Adaptive_Optics_Wavefront_Lab/blob/main/tools/fetch_aot_observations.py">Conversion code ↗</a></li>
+      <li><span>03</span><h3>Test the reduction</h3><p>Exact source parity, mean and percentile distortion, and full-rate power above the reduced Nyquist limit.</p><a href="research/generated/telemetry-decimation-audit.json">Machine-readable audit ↗</a></li>
+      <li><span>04</span><h3>Inspect the result</h3><p>Worker-prepared telemetry maps, sampled trends, frame inspection, and explicit interpretation limits.</p><a href="lab.html">Open the observation ↗</a></li>
+    </ol>
+    <div class="model-branch"><span>Separate learning branch</span><p><strong>Noll modes → delayed feedback → residual phase → FFT intensity.</strong> An opt-in teaching model supports controlled experiments. It is not a reconstruction of the CIAO controller or telescope PSF.</p><a href="lab.html#model-guide">Model guide →</a></div>
+  </section>
+  <section class="section results" id="results">
+    <div class="section-label">03 / Measured outcome</div>
+    <div class="results-layout">
+      <div><h2>What survived the reduction?</h2><p>All 79,200 retained telemetry values, 300 timestamps, and 300 source indices pass the declared parity tolerance. The three scalar diagnostics also pass the study’s mean and percentile thresholds.</p><p>Each diagnostic exceeds the 5% temporal acceptance limit. These are study-specific thresholds, not universal AO standards. A gate failure here limits the browser product; it does not indicate a fault in the telescope.</p><a class="text-link" href="report.html#6-results-and-interpretation">Read the quantitative interpretation →</a></div>
+      <figure class="result-figure"><img src="assets/telemetry-decimation-audit.svg" alt="Above reduced Nyquist power: gradient RMS 20.89%, command RMS 9.19%, mean flux 64.46%; each exceeds a 5% study limit."><figcaption>Hann-windowed, mean-centred full-rate diagnostic power above the reduced 4.99962 Hz Nyquist. The full-rate FITS, rather than the 300-frame product, underlies this calculation.</figcaption></figure>
+    </div>
+  </section>
+  <section class="section" id="learning">
+    <div class="section-label">04 / Learning outcomes</div>
+    <h2>What the work helped me understand</h2>
+    <div class="learning">
+      <article><span>Data engineering</span><h3>A plot needs a chain of custody.</h3><p>FITS extension shapes, source-frame indices, timestamps, hashing, and rounding tolerances turn a visual demo into an inspectable data product.</p></article>
+      <article><span>Scientific reasoning</span><h3>Different claims need different tests.</h3><p>A sample can reproduce a distribution and still lose temporal content. Numerical integrity, representativeness, and physical interpretation require separate evidence.</p></article>
+      <article><span>Optics and control</span><h3>A model’s assumptions are part of its result.</h3><p>Noll normalization, sampled-pupil FFTs, delay, noise, and the exact feedback recurrence determine what the model can teach. Hardware calibration is still required for telescope inference.</p></article>
+    </div>
+  </section>
+  <section class="section next">
+    <div class="section-label">05 / Next research question</div>
+    <h2>A concrete next research question</h2>
+    <p class="lead">How should a compact telemetry product be designed for a specified scientific use?</p>
+    <p>My proposed next experiment compares the current point sample with an explicitly filtered reduction and a full-rate reference. I would define the target bandwidth, filter response, edge handling, and acceptance tests before running the comparison. This is proposed work.</p>
+    <div class="review-resources">
+      <a href="summary.html"><span>Start here / 2 minutes</span><strong>Project at a glance ↗</strong><small>Purpose, pipeline, findings, learning outcomes and next steps.</small></a>
+      <a href="report.html"><span>Technical review / 10 minutes</span><strong>Project report ↗</strong><small>Methods, equations, evidence, learning record, and a reproducibility route.</small></a>
+      <a href="https://github.com/Biswajit1999/Adaptive_Optics_Wavefront_Lab"><span>Inspect and reproduce</span><strong>Source repository ↗</strong><small>Code, original retained data, tests, receipts, and generated evidence.</small></a>
+    </div>
+  </section>
+</main>
+<footer class="site-footer"><p>Biswajit Jana · Adaptive Optics Wavefront Lab</p><nav aria-label="Evidence"><a href="CLAIMS.md">Claims</a><a href="METHODS.md">Methods</a><a href="CITATION.cff">Citation</a><a href="https://doi.org/10.5281/zenodo.8192742">AOT source · CC BY 4.0</a></nav><small>Code: MIT. Public release used for an independent learning and reproducibility study.</small></footer>
+</body>
 </html>

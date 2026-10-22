@@ -63,7 +63,7 @@ scale of the resulting interpretation boundary.
 | Command RMS | 0.0272 | 0.0115 | 9.19% | pass | fail |
 | Mean flux | 0.0411 | 0.0998 | 64.46% | pass | fail |
 
-All 103,800 retained telemetry values plus the 300 timestamps and 300 frame
+All 79,200 retained telemetry values plus the 300 timestamps and 300 frame
 indices pass the provenance gate. All three diagnostics pass the declared
 distribution gate. All three fail the temporal gate.
 
@@ -76,7 +76,7 @@ reconstruction of the CIAO controller.
 
 Simulation mode is isolated from the observation view. It uses six unit-RMS
 Noll-index Zernike modes (`J4`, `J5`, `J6`, `J7`, `J8`, `J11`), a deterministic
-incremental modal PID demonstration, a clear circular pupil, and a monochromatic
+custom accumulating modal feedback demonstration, a clear circular pupil, and a monochromatic
 FFT intensity diagnostic. The Maréchal value is a small-phase approximation from
 modal residual RMS; the FFT peak is computed independently from the pupil field.
 
@@ -113,4 +113,9 @@ generated evidence changes.
    <https://doi.org/10.1051/0004-6361/202348486>.
 3. Noll, R. J. (1976), *Zernike polynomials and atmospheric turbulence*, JOSA
    66(3), 207–211, <https://doi.org/10.1364/JOSA.66.000207>.
+## Interpretation notes
+
+The three diagnostics are aggregates, not an exhaustive channel-wise fidelity test. The approximately 30-second record does not establish behaviour across targets or observing conditions. A failed reduction gate is not evidence that CIAO failed. The 5% limit is a repository choice, not an external preregistration or an AO standard. See [project report](PROJECT_REPORT.md) for scope, learning outcomes and next experiment.
+
+The controller accumulates its proportional contribution in the correction state; it is not a standard positional or velocity-form PID. Ki=0 does not imply a persistent static offset. The wavelength control converts residual waves to OPD nanometres only. Actual worker FFT tests now exercise the deployed implementation, not a copied FFT.
 

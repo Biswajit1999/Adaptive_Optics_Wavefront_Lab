@@ -12,8 +12,17 @@
       "subapertureIntensity": 0.0
     },
     "nyquist_hz": 4.99962,
+    "retained_telemetry_values": 79200,
+    "retained_value_counts": {
+      "gradientX": 20400,
+      "gradientY": 20400,
+      "hodmPosition": 18000,
+      "subapertureIntensity": 20400
+    },
     "sha256": "3b178065db3cb38db498ab965beb58b5c93eb6ff960cd7f9670b500787a5f615",
-    "stride": 50
+    "source_index_count": 300,
+    "stride": 50,
+    "timestamp_count": 300
   },
   "conclusions": {
     "distribution_gate_passed": true,

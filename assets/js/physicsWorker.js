@@ -50,6 +50,9 @@ self.addEventListener("message", (event) => {
   if (message.type === "configure") {
     runtime.requestId = message.requestId;
     configure(message);
+  } else if (message.type === "setConversionWavelength" && runtime.parameters) {
+    runtime.parameters.wavelengthNm = clamp(finiteNumber(message.wavelengthNm, 1650), 100, 10000);
+    if (runtime.mode === "model") emitModelFrame(false);
   } else if (message.type === "setRunning") {
     runtime.running = Boolean(message.running);
     runtime.lastTick = performance.now();
@@ -59,6 +62,10 @@ self.addEventListener("message", (event) => {
       emitObservationCursor();
     }
     ensureTimer();
+  } else if (message.type === "seekObservation" && runtime.observation && runtime.mode === "observation") {
+    runtime.observationPosition = Math.round(clamp(finiteNumber(message.frame, 0), 0, runtime.observation.frameCount - 1));
+    runtime.lastTick = performance.now();
+    emitObservationCursor();
   } else if (message.type === "resetController") {
     if (runtime.mode === "model") {
       resetController();
@@ -106,7 +113,11 @@ function loadObservation() {
         }
         return response.json();
       })
-      .then(buildObservationProduct);
+      .then(buildObservationProduct)
+      .catch((error) => {
+        runtime.observationPromise = null;
+        throw error;
+      });
   }
   return runtime.observationPromise;
 }
@@ -293,12 +304,12 @@ function resetController() {
   runtime.random = createRandom(92017);
 }
 
-function emitModelFrame() {
+function emitModelFrame(advance = runtime.running) {
   if (!runtime.parameters || runtime.mode !== "model") {
     return;
   }
   const started = performance.now();
-  if (runtime.running) {
+  if (advance) {
     const steps = Math.max(1, Math.round(runtime.parameters.loopRateHz * FRAME_INTERVAL_MS / 1000));
     for (let index = 0; index < steps; index += 1) {
       advanceController();
@@ -329,6 +340,7 @@ function emitModelFrame() {
       timeSeconds: runtime.timeSeconds,
       inputRms,
       residualRms,
+      residualOpdNm: residualRms * runtime.parameters.wavelengthNm,
       strehl,
       psfPeak: psf.normalisedPeak,
       servoError: residualRms,
