@@ -1,0 +1,164 @@
+{
+  "schema": 1,
+  "project": "Adaptive Optics Wavefront Lab",
+  "tables": [
+    {
+      "path": "data/validation_summary.csv",
+      "label": "Validation summary",
+      "role": "Data and provenance",
+      "rows": 10,
+      "width_mismatches": 0,
+      "columns": [
+        {
+          "name": "check",
+          "blank": 0,
+          "text": 10,
+          "finite": 0,
+          "nonfinite": 0
+        },
+        {
+          "name": "value",
+          "blank": 0,
+          "text": 1,
+          "finite": 9,
+          "nonfinite": 0
+        },
+        {
+          "name": "expected",
+          "blank": 0,
+          "text": 2,
+          "finite": 8,
+          "nonfinite": 0
+        },
+        {
+          "name": "passed",
+          "blank": 0,
+          "text": 10,
+          "finite": 0,
+          "nonfinite": 0
+        }
+      ]
+    },
+    {
+      "path": "data/strehl_table.csv",
+      "label": "Strehl table",
+      "role": "Data and provenance",
+      "rows": 101,
+      "width_mismatches": 0,
+      "columns": [
+        {
+          "name": "rms_waves",
+          "blank": 0,
+          "text": 0,
+          "finite": 101,
+          "nonfinite": 0,
+          "minimum": 0.0,
+          "maximum": 0.2
+        },
+        {
+          "name": "strehl",
+          "blank": 0,
+          "text": 0,
+          "finite": 101,
+          "nonfinite": 0,
+          "minimum": 0.20615299242398244,
+          "maximum": 1.0
+        }
+      ]
+    },
+    {
+      "path": "research/generated/telemetry-decimation-audit.csv",
+      "label": "Telemetry decimation audit",
+      "role": "Data and provenance",
+      "rows": 3,
+      "width_mismatches": 0,
+      "columns": [
+        {
+          "name": "metric",
+          "blank": 0,
+          "text": 3,
+          "finite": 0,
+          "nonfinite": 0
+        },
+        {
+          "name": "full_n",
+          "blank": 0,
+          "text": 0,
+          "finite": 3,
+          "nonfinite": 0,
+          "minimum": 15000.0,
+          "maximum": 15000.0
+        },
+        {
+          "name": "retained_n",
+          "blank": 0,
+          "text": 0,
+          "finite": 3,
+          "nonfinite": 0,
+          "minimum": 300.0,
+          "maximum": 300.0
+        },
+        {
+          "name": "full_mean",
+          "blank": 0,
+          "text": 0,
+          "finite": 3,
+          "nonfinite": 0,
+          "minimum": 0.15875238998,
+          "maximum": 5266.29525098
+        },
+        {
+          "name": "retained_mean",
+          "blank": 0,
+          "text": 0,
+          "finite": 3,
+          "nonfinite": 0,
+          "minimum": 0.158823195004,
+          "maximum": 5267.42240196
+        },
+        {
+          "name": "mean_error_in_full_sd",
+          "blank": 0,
+          "text": 0,
+          "finite": 3,
+          "nonfinite": 0,
+          "minimum": 0.00535873924396,
+          "maximum": 0.0411465547043
+        },
+        {
+          "name": "largest_quantile_error_in_full_iqr",
+          "blank": 0,
+          "text": 0,
+          "finite": 3,
+          "nonfinite": 0,
+          "minimum": 0.0115390059835,
+          "maximum": 0.10918876072
+        },
+        {
+          "name": "power_above_reduced_nyquist_fraction",
+          "blank": 0,
+          "text": 0,
+          "finite": 3,
+          "nonfinite": 0,
+          "minimum": 0.0918805682795,
+          "maximum": 0.644570986271
+        },
+        {
+          "name": "distribution_gate_passed",
+          "blank": 0,
+          "text": 3,
+          "finite": 0,
+          "nonfinite": 0
+        },
+        {
+          "name": "temporal_gate_passed",
+          "blank": 0,
+          "text": 3,
+          "finite": 0,
+          "nonfinite": 0
+        }
+      ]
+    }
+  ],
+  "excluded": []
+}
