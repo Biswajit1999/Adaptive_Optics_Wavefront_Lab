@@ -8,6 +8,7 @@ from __future__ import annotations
 import math
 import random
 import statistics
+from numbers import Integral
 
 
 def alias_frequency(frequency_hz: float, sample_rate_hz: float) -> float:
@@ -28,8 +29,9 @@ def block_mean_interval(values, block_length: int, *, draws=2000, seed=0):
     x = [float(v) for v in values]
     n = len(x)
     if (n < 3 or any(not math.isfinite(v) for v in x)
-            or isinstance(block_length, bool) or not isinstance(block_length, int)
-            or not 1 <= block_length <= n or draws < 20):
+            or isinstance(block_length, bool) or not isinstance(block_length, Integral)
+            or not 1 <= block_length <= n or isinstance(draws, bool)
+            or not isinstance(draws, Integral) or draws < 20):
         raise ValueError("invalid series, block length, or draw count")
     rng = random.Random(seed)
     means = []
@@ -64,6 +66,9 @@ if __name__ == "__main__":
                 alias_frequency(1, 0)
             with self.assertRaises(ValueError):
                 block_mean_interval([1, 2], 1)
+            for draws in (19, 100.5, float("nan"), True):
+                with self.subTest(draws=draws), self.assertRaises(ValueError):
+                    block_mean_interval([1, 2, 3], 1, draws=draws)
 
         def test_bootstrap(self):
             a = block_mean_interval([2.0] * 12, 3, draws=100)
