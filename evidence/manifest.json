@@ -1,0 +1,189 @@
+{
+  "schema": 1,
+  "project": "Adaptive Optics Wavefront Lab",
+  "repository": "https://github.com/Biswajit1999/Adaptive_Optics_Wavefront_Lab",
+  "files": [
+    {
+      "label": "Validation summary",
+      "path": "data/validation_summary.csv",
+      "role": "Data and provenance",
+      "bytes": 409,
+      "sha256": "314cdf0865f5121daa5fa91f0a8975212e610f6bfbb190c94dab8df402c99cd9",
+      "hash_basis": "LF-normalised text",
+      "format": "CSV",
+      "rows": 10,
+      "columns": 4,
+      "headers": [
+        "check",
+        "value",
+        "expected",
+        "passed"
+      ],
+      "preview": [
+        [
+          "J4_unit_rms",
+          "1.00012693154",
+          "1.0",
+          "True"
+        ],
+        [
+          "J5_unit_rms",
+          "1.00002836408",
+          "1.0",
+          "True"
+        ],
+        [
+          "J6_unit_rms",
+          "1.0002267284",
+          "1.0",
+          "True"
+        ],
+        [
+          "J7_unit_rms",
+          "1.00018935041",
+          "1.0",
+          "True"
+        ]
+      ]
+    },
+    {
+      "label": "Strehl table",
+      "path": "data/strehl_table.csv",
+      "role": "Data and provenance",
+      "bytes": 2513,
+      "sha256": "c457e503fe30a9ffcebd7071dd0e399a9007bf2efbdeb649900798c475f29999",
+      "hash_basis": "LF-normalised text",
+      "format": "CSV",
+      "rows": 101,
+      "columns": 2,
+      "headers": [
+        "rms_waves",
+        "strehl"
+      ],
+      "preview": [
+        [
+          "0.0",
+          "1.0"
+        ],
+        [
+          "0.002",
+          "0.9998420987972899"
+        ],
+        [
+          "0.004",
+          "0.9993685447701516"
+        ],
+        [
+          "0.006",
+          "0.9985797864254201"
+        ]
+      ]
+    },
+    {
+      "label": "Ciao1 aot metadata",
+      "path": "data/observations/ciao1_aot_metadata.json",
+      "role": "Data and provenance",
+      "bytes": 1269,
+      "sha256": "2684691eba1a5b9e51de47ecdeade375e0910aa6e880360387d2829fed269737",
+      "hash_basis": "LF-normalised text",
+      "format": "JSON",
+      "keys": [
+        "zenodoRecord",
+        "doi",
+        "file",
+        "downloadUrl",
+        "md5",
+        "license",
+        "instrument"
+      ],
+      "arrays": {}
+    },
+    {
+      "label": "Ciao1 aot telemetry",
+      "path": "data/observations/ciao1_aot_telemetry.json",
+      "role": "Data and provenance",
+      "bytes": 703871,
+      "sha256": "3b178065db3cb38db498ab965beb58b5c93eb6ff960cd7f9670b500787a5f615",
+      "hash_basis": "LF-normalised text",
+      "format": "JSON",
+      "keys": [
+        "dataset",
+        "format",
+        "source",
+        "processing",
+        "telemetry"
+      ],
+      "arrays": {}
+    },
+    {
+      "label": "Telemetry decimation audit",
+      "path": "research/generated/telemetry-decimation-audit.csv",
+      "role": "Data and provenance",
+      "bytes": 514,
+      "sha256": "be92f296786a0fc6a55a26d595b14af3c38fa89376ec4495ab987cc9edac2991",
+      "hash_basis": "LF-normalised text",
+      "format": "CSV",
+      "rows": 3,
+      "columns": 10,
+      "headers": [
+        "metric",
+        "full_n",
+        "retained_n",
+        "full_mean",
+        "retained_mean",
+        "mean_error_in_full_sd",
+        "largest_quantile_error_in_full_iqr"
+      ],
+      "preview": [
+        [
+          "gradient_rms",
+          "15000",
+          "300",
+          "0.15875238998",
+          "0.158823195004",
+          "0.00535873924396",
+          "0.10918876072"
+        ],
+        [
+          "command_rms",
+          "15000",
+          "300",
+          "0.16446995167",
+          "0.163906043074",
+          "0.0272439405129",
+          "0.0115390059835"
+        ],
+        [
+          "mean_flux",
+          "15000",
+          "300",
+          "5266.29525098",
+          "5267.42240196",
+          "0.0411465547043",
+          "0.0997628458498"
+        ]
+      ]
+    },
+    {
+      "label": "Telemetry decimation audit",
+      "path": "research/generated/telemetry-decimation-audit.json",
+      "role": "Data and provenance",
+      "bytes": 5110,
+      "sha256": "1a099ad85f2e11803e352d0d838d31c7b2d70a05d0ddb634cf5e5a21d0296cae",
+      "hash_basis": "LF-normalised text",
+      "format": "JSON",
+      "keys": [
+        "browser_product",
+        "conclusions",
+        "metrics",
+        "predeclared_gates",
+        "schema_version",
+        "source",
+        "study"
+      ],
+      "arrays": {
+        "metrics": 3
+      }
+    }
+  ]
+}

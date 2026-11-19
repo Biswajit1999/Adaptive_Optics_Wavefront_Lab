@@ -1,0 +1,36 @@
+{
+  "project": "Adaptive Optics Wavefront Lab",
+  "repository": "https://github.com/Biswajit1999/Adaptive_Optics_Wavefront_Lab",
+  "files": [
+    {
+      "label": "Validation summary",
+      "path": "data/validation_summary.csv",
+      "role": "Data and provenance"
+    },
+    {
+      "label": "Strehl table",
+      "path": "data/strehl_table.csv",
+      "role": "Data and provenance"
+    },
+    {
+      "label": "Ciao1 aot metadata",
+      "path": "data/observations/ciao1_aot_metadata.json",
+      "role": "Data and provenance"
+    },
+    {
+      "label": "Ciao1 aot telemetry",
+      "path": "data/observations/ciao1_aot_telemetry.json",
+      "role": "Data and provenance"
+    },
+    {
+      "label": "Telemetry decimation audit",
+      "path": "research/generated/telemetry-decimation-audit.csv",
+      "role": "Data and provenance"
+    },
+    {
+      "label": "Telemetry decimation audit",
+      "path": "research/generated/telemetry-decimation-audit.json",
+      "role": "Data and provenance"
+    }
+  ]
+}
