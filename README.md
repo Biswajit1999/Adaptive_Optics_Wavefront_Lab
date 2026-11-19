@@ -100,3 +100,17 @@ Gomes et al., [Proof-of-concept AO telemetry data using the AOT standard format]
 [AOT specification paper](https://doi.org/10.1051/0004-6361/202348486) · [Noll (1976)](https://doi.org/10.1364/JOSA.66.000207) · [CITATION.cff](CITATION.cff) · [Software licence](LICENSE)
 
 The source teams acquired the observation. This project's contribution is the learning, processing, inspection and validation workflow.
+
+## Research evidence and downloads
+
+- [Download the machine-readable table profiles](evidence/table-profiles.json) for 3 archived tables. Open `table-evidence.html` from the checkout for the coverage chart.
+- Start with [Validation summary](data/validation_summary.csv), [Strehl table](data/strehl_table.csv), [Ciao1 aot metadata](data/observations/ciao1_aot_metadata.json).
+
+Run these commands from the repository root to rebuild the published evidence.
+
+```sh
+python scripts/evidence_catalog.py
+python scripts/render_evidence_page.py
+python scripts/profile_evidence_tables.py
+python scripts/render_table_profiles.py
+```
