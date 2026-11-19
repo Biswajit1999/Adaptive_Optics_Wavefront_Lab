@@ -38,6 +38,10 @@ The retained channels contain **79,200 telemetry values**: 300 × (68 X gradient
 
 See [methods](METHODS.md), [claim ledger](CLAIMS.md) and [generated evidence](research/generated/telemetry-decimation-audit.json).
 
+![Share of full-rate diagnostic power above the Nyquist limit of the browser telemetry product](assets/telemetry-decimation-audit.svg)
+
+[Download the audit table](research/generated/telemetry-decimation-audit.csv) or explore [the synthetic aliasing and bootstrap checks](research/DECIMATION_SENSITIVITY_20261118.md) to see how the two diagnostics behave under controlled inputs.
+
 ## Explore the project
 
 1. Read the [project summary](PROJECT_SUMMARY.md) for motivation, contribution and findings.
